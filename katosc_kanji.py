@@ -1,5 +1,7 @@
-# Avatar Text OSC App for VRChat
-# Copyright (C) 2022 KillFrenzy / Evan Tran
+# Subtiles for VRChat
+# Copyright (C) 2022 Kuretan
+#This software is mainly based on 
+#Avatar Text OSC App for VRChat Copyright (C) 2022 KillFrenzy / Evan Tran 
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +17,11 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+from operator import le
 from threading import Timer
 from pythonosc import udp_client, osc_server, dispatcher
 import math, asyncio, threading
+import csv
 
 
 class KatOscConfig:
@@ -51,7 +55,7 @@ class KatOsc:
 		self.line_length = config.line_length
 		self.line_count = config.line_count
 
-		self.text_length = 128 # Maximum length of text
+		self.text_length =128 # Maximum length of text
 		self.sync_params_max = 8 # Maximum sync parameters
 
 		self.pointer_count = int(self.text_length / self.sync_params)
@@ -60,23 +64,27 @@ class KatOsc:
 		self.sync_params_test_char_value = 97 # Character value to use when testing sync parameters
 
 		self.param_visible = "KAT_Visible"
-		self.param_pointer = "KAT_Pointer2"
+		self.param_pointer = "KAT_Pointer2"#バグの関係で必要　
+		# self.param_pointer = "KAT_Pointer"
 		self.param_sync = "KAT_CharSync"
 
 		self.osc_parameter_prefix = "/avatar/parameters/"
 		self.osc_avatar_change_path = "/avatar/change"
 		self.osc_text = ""
 		self.target_text = ""
-
+		#２バイト文字対応のための変換表の読み込み
+		with open("convertlist.csv","r",encoding="UTF") as f:
+			reader=csv.reader(f)
+			self.letters_list=[row for row in reader]
 		self.invalid_char = "?" # character used to replace invalid characters
-
+		#1バイトの文字を二つ使うことで強引に２バイト文字に対応する
 		self.keys = {
 			" " :0,
-			"　" :0,
+			"　" :0,#全角スペースに対応
 			"!":1,
 			"\"":2,
 			"#":3,
-			"S":4,
+			"$":4,
 			"%":5,
 			"&":6,
 			"'":7,
@@ -148,7 +156,7 @@ class KatOsc:
 			"i":73,
 			"j":74,
 			"k":75,
-			"i":76,
+			"l":76,
 			"m":77,
 			"n":78,
 			"o":79,
@@ -200,134 +208,7 @@ class KatOsc:
 			"ほ":125,
 			"ま":126,
 			"み":127,
-			"む":128,
-			"め":129,
-			"も":130,
-			"や":131,
-			"ゆ":132,
-			"よ":133,
-			"ら":134,
-			"り":135,
-			"る":136,
-			"れ":137,
-			"ろ":138,
-			"わ":139,
-			"を":140,
-			"ん":141,
-			"ア":142,
-			"イ":143,
-			"ウ":144,
-			"エ":145,
-			"オ":146,
-			"カ":147,
-			"キ":148,
-			"ク":149,
-			"ケ":150,
-			"コ":151,
-			"サ":152,
-			"シ":153,
-			"ス":154,
-			"セ":155,
-			"ソ":156,
-			"タ":157,
-			"チ":158,
-			"ツ":159,
-			"テ":160,
-			"ト":161,
-			"ナ":162,
-			"ニ":163,
-			"ヌ":164,
-			"ネ":165,
-			"ノ":166,
-			"ハ":167,
-			"ヒ":168,
-			"フ":169,
-			"ヘ":170,
-			"ホ":171,
-			"マ":172,
-			"ミ":173,
-			"ム":174,
-			"メ":175,
-			"モ":176,
-			"ヤ":177,
-			"ユ":178,
-			"ヨ":179,
-			"ラ":180,
-			"リ":181,
-			"ル":182,
-			"レ":183,
-			"ロ":184,
-			"ワ":185,
-			"ヲ":186,
-			"ン":187,
-			"が":188,
-			"ぎ":189,
-			"ぐ":190,
-			"げ":191,
-			"ご":192,
-			"ざ":193,
-			"じ":194,
-			"ず":195,
-			"ぜ":196,
-			"ぞ":197,
-			"だ":198,
-			"ぢ":199,
-			"づ":200,
-			"で":201,
-			"ど":202,
-			"ば":203,
-			"び":204,
-			"ぶ":205,
-			"べ":206,
-			"ぼ":207,
-			"ヴ":208,
-			"ガ":209,
-			"ギ":210,
-			"グ":211,
-			"ゲ":212,
-			"ゴ":213,
-			"ザ":214,
-			"ジ":215,
-			"ズ":216,
-			"ゼ":217,
-			"ゾ":218,
-			"ダ":219,
-			"ヂ":220,
-			"ヅ":221,
-			"デ":222,
-			"ド":223,
-			"バ":224,
-			"ビ":225,
-			"ブ":226,
-			"ベ":227,
-			"ボ":228,
-			"ぱ":229,
-			"ぴ":230,
-			"ぷ":231,
-			"ぺ":232,
-			"ぽ":233,
-			"パ":234,
-			"ピ":235,
-			"プ":236,
-			"ペ":237,
-			"ポ":238,
-			"っ":239,
-			"ゃ":240,
-			"ゅ":241,
-			"ょ":242,
-			"ァ":243,
-			"ッ":244,
-			"ャ":245,
-			"ュ":246,
-			"ョ":247,
-			"ヮ":248,
-			"。":249,
-			"、":250,
-			"・":251,
-			"ー":252,
-			"～":253,
-			"「":254,
-			"」":255
+			"む":128
 		}
 
 		# Character to use in place of unknown characters
@@ -366,6 +247,19 @@ class KatOsc:
 	def set_text(self, text: str):
 		self.target_text = text
 
+	#二バイトの文字を二種類の1バイトの文字に対応させる
+	#例　亜:5,#　↓:こ,8
+	def convert(self,text_lines):
+		text_lines[1]='                                '
+		text_lines[2]=text_lines[0]
+		for letters in self.letters_list:
+			text_lines=self.replace(text_lines,letters)
+		return text_lines
+	
+	def replace(self,text_lines,letters):
+		text_lines[0]=text_lines[0].replace(letters[0],letters[1])
+		text_lines[2]=text_lines[2].replace(letters[0],letters[2])
+		return text_lines
 
 	# Syncronisation loop
 	def osc_timer_loop(self):
@@ -419,6 +313,10 @@ class KatOsc:
 		text_lines = gui_text.split("\n")
 		for index, text in enumerate(text_lines):
 			text_lines[index] = self._pad_line(text)
+		try:
+			text_lines=self.convert(text_lines)                           
+		except:
+			pass
 		gui_text = self._list_to_string(text_lines)
 
 		# Pad text with spaces up to the text limit
@@ -446,7 +344,6 @@ class KatOsc:
 					for char_index in range(self.sync_params):
 						index = (pointer_index * self.sync_params) + char_index
 						gui_char = gui_text[index]
-
 						# Convert character to the key value, replace invalid characters
 						key = self.keys.get(gui_char, self.invalid_char_value)
 
@@ -516,8 +413,6 @@ class KatOsc:
 	# hide overlay
 	def hide(self):
 		self.osc_client.send_message(self.osc_parameter_prefix + self.param_visible, False) # Hide KAT
-
-
 
 class RepeatedTimer(object):
 	def __init__(self, interval, function, *args, **kwargs):
