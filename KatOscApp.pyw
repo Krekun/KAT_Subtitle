@@ -18,22 +18,24 @@
 from tkinter import Tk, Text, Button
 import math
 import sys
-
-import katosc
+import time
+import katosc_kanji
+from main import Make_sound
 
 class KatOscApp:
 	def __init__(self):
-		self.kat = katosc.KatOsc()
+		self.kat = katosc_kanji.KatOsc()
+		self.Make_sound=Make_sound(_who_speak=3)
 		self.text_length = self.kat.text_length
 		self.line_length = self.kat.line_length
 		self.line_count = self.kat.line_count
-
+		self.old_sentence=""
 		# --------------
 		# GUI Setup
 		# --------------
 		self.window = window = Tk()
 		window.title("KillFrenzy Avatar Text OSC")
-		window.geometry("630x214")
+		window.geometry("525x140")
 		window.configure(bg = "#333")
 		window.resizable(False, False)
 
@@ -49,15 +51,16 @@ class KatOscApp:
 
 		self.gui_text = Text(window,
 			font = ("Courier New", 24),
-			width = self.line_length,
-			height = 4,
+			# width = self.line_length,
+			width = 28,
+			height = 2,
 			border = 0,
 			wrap = "char",
 			fg = "#fff",
 			bg = "#222",
 			insertbackground = "#fff"
 		)
-		self.gui_text.grid(column = 0, row = 1, padx = 10, pady = 10)
+		self.gui_text.grid(column = 0, row = 1, padx = 0, pady = 10)
 		self.gui_text.bind_all('<Key>', self._limit_text_length)
 
 		# Create clear button
@@ -70,7 +73,7 @@ class KatOscApp:
 			width = 16,
 			height = 2
 		)
-		self.gui_clear.grid(column = 0, row = 2, padx = 10, pady = 0, sticky = "ne")
+		# self.gui_clear.grid(column = 0, row = 2, padx = 0, pady = 0, sticky = "ne")
 
 		# Start App
 		self.window.mainloop()
@@ -92,7 +95,8 @@ class KatOscApp:
 	# Limits the text length of the text box
 	def _limit_text_length(self, *args):
 		# Prevent too many line feeds
-		self.gui_text.delete(5.0, "end")
+		# self.gui_text.delete(5.0, "end")
+		self.gui_text.delete(2.0, "end")
 
 		# Grab the text from the text box
 		gui_text_original = self.gui_text.get(1.0, "end")
@@ -111,11 +115,25 @@ class KatOscApp:
 				length_padded += self._get_padded_length(text)
 
 		# Delete text if it's too long
-		if length_padded >= self.text_length:
-			self.gui_text.delete("end-" + str(length_padded - self.text_length + 1) + "c", "end")
-
+		# if length_padded >= self.text_length:
+		# 	self.gui_text.delete("end-" + str(length_padded - self.text_length + 1) + "c", "end")
+		
+		if length_padded >= 32:
+			self.gui_text.delete("end-" + str(length_padded - 32 + 1) + "c", "end")
 		# Send text
-		self.kat.set_text(self.gui_text.get(1.0, "end"))
+		self.present_sentence=self.gui_text.get(1.0, "end")+"\n"
+		# self.kat.set_text(self.gui_text.get(1.0, "end")+"\n")
+		self.kat.set_text(self.present_sentence)
+		# print(self.present_sentence,self.present_sentence in self.old_sentence)
+		# if "？" in self.present_sentence or "。" in self.present_sentence:
+		# 	if self.present_sentence==self.old_sentence:
+		# 		pass
+		# 	else:
+		# 		self.Make_sound.speech(self.gui_text.get(1.0, "end"))
+		# 		self.old_sentence=self.present_sentence
+			# time.sleep(5)
+			# self.set_text("")
+			# self.kat.set_text(self.gui_text.get(1.0, "end"))
 
 
 	# Gets the effective padded length of a line
