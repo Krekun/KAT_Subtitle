@@ -11,8 +11,8 @@ class Make_sound():
             # print(lang_list)
             # if "standard" in self.lang_list:
             if _is_standard:
-                self.vc.loadLanguage("standard")
-                # vc.loadLanguage("standard_kansai")
+                # self.vc.loadLanguage("standard")
+                self.vc.loadLanguage("standard_kansai")
             elif 0 < len(self.lang_list):
                 self.vc.loadLanguage(self.lang_list[0])
             else:

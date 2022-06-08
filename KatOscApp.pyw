@@ -23,6 +23,7 @@ import sys
 import time
 import katosc_kanji
 from hook_for_voiceroid2 import Make_sound
+import re
 
 class KatOscApp:
 	def __init__(self):
@@ -32,6 +33,7 @@ class KatOscApp:
 		self.line_length = self.kat.line_length
 		self.line_count = self.kat.line_count
 		self.old_sentence=""
+		# self.p = re.compile('[a-zA-Z]+$')
 		# --------------
 		# GUI Setup
 		# --------------
@@ -64,17 +66,17 @@ class KatOscApp:
 		self.gui_text.grid(column = 0, row = 1, padx = 0, pady = 10)
 		self.gui_text.bind_all('<Key>', self._limit_text_length)
 
-		## Create clear button
-		# self.gui_clear = Button(window,
-		# 	text = "Clear",
-		# 	command = lambda:self.set_text(""),
-		# 	border = 0,
-		# 	fg = "#ddd",
-		# 	bg = "#444",
-		# 	width = 16,
-		# 	height = 2
-		# )
-		# self.gui_clear.grid(column = 0, row = 2, padx = 0, pady = 0, sticky = "ne")
+		# Create clear button
+		self.gui_clear = Button(window,
+			text = "Clear",
+			command = lambda:self.set_text(""),
+			border = 0,
+			fg = "#ddd",
+			bg = "#444",
+			width = 16,
+			height = 2
+		)
+		self.gui_clear.grid(column = 0, row = 2, padx = 0, pady = 0, sticky = "ne")
 
 		# Start App
 		self.window.mainloop()
@@ -117,12 +119,17 @@ class KatOscApp:
 		# Delete text if it's too long
 		if length_padded >= 32:
 			self.gui_text.delete("end-" + str(length_padded - 32 + 1) + "c", "end")
+			self.present_sentence=self.gui_text.get(1.0, "end")+"\n"
+			self.set_text("")
+		else:
+			self.present_sentence=self.gui_text.get(1.0, "end")+"\n"
 		# Send text
-		self.present_sentence=self.gui_text.get(1.0, "end")+"\n"
 		self.kat.set_text(self.present_sentence)
 		#Windowsの音声認識を利用する際の処理
 		#？と。の存在は文の終わりを示している
 		#文章が終わったら音声を読み上げ、任意の秒数字幕を表示してから文章を削除する
+		# eng=self.p.search(self.present_sentence)
+		# print(self.present_sentence,eng)
 		if "？" in self.present_sentence or "。" in self.present_sentence:
 			if self.present_sentence==self.old_sentence:
 				pass

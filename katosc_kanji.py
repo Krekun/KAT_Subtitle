@@ -56,7 +56,7 @@ class KatOsc:
 		self.line_count = config.line_count
 
 		self.text_length =128 # Maximum length of text
-		self.sync_params_max = 8 # Maximum sync parameters
+		self.sync_params_max = 16 # Maximum sync parameters
 
 		self.pointer_count = int(self.text_length / self.sync_params)
 		self.pointer_clear = 255
@@ -65,7 +65,7 @@ class KatOsc:
 
 		self.param_visible = "KAT_Visible"
 		self.param_pointer = "KAT_Pointer2"#バグの関係で必要　
-		# self.param_pointer = "KAT_Pointer"
+		self.param_pointer = "KAT_Pointer"
 		self.param_sync = "KAT_CharSync"
 
 		self.osc_parameter_prefix = "/avatar/parameters/"
@@ -223,7 +223,7 @@ class KatOsc:
 		self.osc_timer = RepeatedTimer(self.osc_delay, self.osc_timer_loop)
 
 		self.osc_client.send_message(self.osc_parameter_prefix + self.param_visible, True) # Make KAT visible
-		self.osc_client.send_message(self.osc_parameter_prefix + self.param_pointer, 255) # Clear KAT text
+		self.osc_client.send_message(self.osc_parameter_prefix + self.param_pointer, self.pointer_clear) # Clear KAT text
 		for value in range(self.sync_params):
 			self.osc_client.send_message(self.osc_parameter_prefix + self.param_sync + str(value), 0.0) # Reset KAT characters sync
 
