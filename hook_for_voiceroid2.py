@@ -2,6 +2,8 @@ import pyvcroid2
 import winsound
 import sys
 
+#ハンドジェスチャーに応じて声質や音声を変える。
+#OSCで調整できる 速さやピッチの調整も可能
 
 class Make_sound():
     def __init__(self,_is_standard=True,_who_speak=3):
@@ -17,7 +19,7 @@ class Make_sound():
                 self.vc.loadLanguage(self.lang_list[0])
             else:
                 raise Exception("No language library")
-            
+            # # Set parameters
             # Load Voice
             self.voice_list =self.vc.listVoices()
             if 0 < len(self.voice_list):
@@ -25,8 +27,6 @@ class Make_sound():
                 self.vc.loadVoice(self.voice_list[_who_speak])
             else:
                 raise Exception("No voice library")
-            
-            # # Set parameters
             self.vc.param.volume = 1.23
             self.vc.param.speed = 0.987
             self.vc.param.pitch = 1.111
@@ -35,6 +35,7 @@ class Make_sound():
             self.vc.param.pauseLong = 100
             self.vc.param.pauseSentence = 200
             self.vc.param.masterVolume = 1.123
+            
     def speech(self,text):
         # Text to speech
         # text="".join(sys.argv[1:])
@@ -44,7 +45,14 @@ class Make_sound():
         #     tes.write(speech)
 
 if __name__ == "__main__":
-    app=Make_sound(_who_speak=3)
-    text="".join(sys.argv[1:])
-    # text="123"
+    app=Make_sound(_who_speak=6)
+    app.vc.param.speed = 1.987
+    app.vc.param.pitch = 1.911
+    # text="".join(sys.argv[1:])
+    text="オブジェクトの削除について"
+    app.speech(text)
+    del app
+    app=Make_sound()
+    # text="".join(sys.argv[1:])
+    text="123"
     app.speech(text)
