@@ -1,7 +1,5 @@
-# Subtiles for VRChat
+# K's Avatar Text
 # Copyright (C) 2022 Kuretan
-#This software is mainly based on 
-#Avatar Text OSC App for VRChat Copyright (C) 2022 KillFrenzy / Evan Tran 
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,18 +15,23 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-from tkinter import Tk, Text, Button
+from tkinter import Tk, Text, Button,Checkbutton,BooleanVar
 import math
 import sys
 import time
 import katosc_kanji
 from hook_for_voiceroid2 import Make_sound
-import re
+# import re
+import winsound
+# import win32gui
+# import win32con
+# import pyautogui
+# import ctypes
 
 class KatOscApp:
 	def __init__(self):
 		self.kat = katosc_kanji.KatOsc()
-		self.Make_sound=Make_sound(_who_speak=3)
+		self.Make_sound=Make_sound(_who_speak=6)
 		self.text_length = self.kat.text_length
 		self.line_length = self.kat.line_length
 		self.line_count = self.kat.line_count
@@ -39,7 +42,7 @@ class KatOscApp:
 		# --------------
 		self.window = window = Tk()
 		window.title("Subtiles for VRChat")
-		window.geometry("525x140")
+		# window.geometry("525x140")
 		window.configure(bg = "#333")
 		window.resizable(False, False)
 
@@ -63,7 +66,7 @@ class KatOscApp:
 			bg = "#222",
 			insertbackground = "#fff"
 		)
-		self.gui_text.grid(column = 0, row = 1, padx = 0, pady = 10)
+		self.gui_text.grid(column = 0, row = 0, padx = 0, pady = 10)
 		self.gui_text.bind_all('<Key>', self._limit_text_length)
 
 		# Create clear button
@@ -76,13 +79,42 @@ class KatOscApp:
 			width = 16,
 			height = 2
 		)
-		self.gui_clear.grid(column = 0, row = 2, padx = 0, pady = 0, sticky = "ne")
+		# self.gui_clear.grid(column = 1, row = 1, padx = 0, pady = 0, sticky = "ne")
+		# self.gui_clear.grid(column = 0, row = 1, padx = 0, pady = 0, sticky = "ne")
+
+		# Create cheack button
+		self.bln = BooleanVar()
+		self.bln.set(True)
+		self.gui_voice = Checkbutton(window,
+			text = "Voice",
+			 variable=self.bln,
+			border = 0,
+			width = 16,
+			bg = "#444",
+			height = 2
+		)
+		# self.gui_voice.grid(column = 1, row = 0, padx = 0, pady = 0)
 
 		# Start App
 		self.window.mainloop()
+		self.foreground()
 
 		# Stop App
 		self.kat.stop()
+
+	# def foreground(self):
+	# 	hwnd = ctypes.windll.user32.FindWindowW("Subtiles for VRChat", 0)
+	# 	win32gui.SetWindowPos(hwnd,win32con.HWND_TOPMOST,0,0,0,0,win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
+	# 	#2つ目の要素の内容
+	# 	#HWND_TOPMOST:ウィンドウを常に最前面にする。
+	# 	#HWND_BOTTOM:ウィンドウを最後に置く。
+	# 	#HWND_NOTOPMOST:ウィンドウの最前面解除。
+	# 	#HWND_TOP:ウィンドウを先頭に置く。
+
+	# 	left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+	# 	win32gui.SetForegroundWindow(hwnd)
+	# 	pyautogui.moveTo(left+60, top + 10)
+	# 	pyautogui.click()
 
 
 	# Set the text to any value
@@ -130,19 +162,44 @@ class KatOscApp:
 		#文章が終わったら音声を読み上げ、任意の秒数字幕を表示してから文章を削除する
 		# eng=self.p.search(self.present_sentence)
 		# print(self.present_sentence,eng)
+		if "早くしゃべります。" in self.present_sentence:
+					self.Make_sound.vc.param.speed = 1.987
+					self.Make_sound.vc.param.pitch = 1.911
+		if "普通にしゃべります。" in self.present_sentence:
+					self.Make_sound.vc.param.speed = 0.987
+					self.Make_sound.vc.param.pitch =  1.111
+		if "音声オフ" in self.present_sentence:
+					self.bln.set(False)
+					self.set_text("")
 		if "？" in self.present_sentence or "。" in self.present_sentence:
 			if self.present_sentence==self.old_sentence:
 				pass
 			else:
-				self.Make_sound.speech(self.gui_text.get(1.0, "end"))
+				if (self.bln.get()):
+					if "何言ってんだこいつ？" in self.present_sentence:
+						self.play_exvoice(r"D:\Documents\投稿動画\素材\kiritan_exVOICE\0よく使うやつ\なにいってんだこいつ。.wav")
+					elif "ありがとうございます。" in self.present_sentence:
+						self.play_exvoice(r"D:\Documents\投稿動画\素材\kiritan_exVOICE\挨拶・相槌\ありがとうございます　興奮.wav")
+					else:
+						self.Make_sound.speech(self.gui_text.get(1.0, "end"))
+				if "音声オン" in self.present_sentence:
+					self.bln.set(True)
 				self.old_sentence=self.present_sentence
-			time.sleep(3)
+			time.sleep(3)#ここなんとかしたい　フリーズっぽい
 			self.set_text("")
 
 	# Gets the effective padded length of a line
 	def _get_padded_length(self, text: str):
 		lines = max(math.ceil(len(text) / self.line_length), 1)
 		return self.line_length * lines
+	def change_voie(self,_who_speak):
+		del self.Make_sound
+		self.Make_sound=Make_sound(_who_speak)
+	def play_exvoice(Self,path):
+		with open(path, 'rb') as f:
+			data = f.read()
+			winsound.PlaySound(data, winsound.SND_MEMORY)
+
 
 
 if __name__ == "__main__":

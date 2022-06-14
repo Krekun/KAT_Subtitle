@@ -23,7 +23,7 @@ class Make_sound():
             # Load Voice
             self.voice_list =self.vc.listVoices()
             if 0 < len(self.voice_list):
-                # print(voice_list)
+                print(self.voice_list)
                 self.vc.loadVoice(self.voice_list[_who_speak])
             else:
                 raise Exception("No voice library")
@@ -45,14 +45,18 @@ class Make_sound():
         #     tes.write(speech)
 
 if __name__ == "__main__":
-    app=Make_sound(_who_speak=6)
-    app.vc.param.speed = 1.987
-    app.vc.param.pitch = 1.911
-    # text="".join(sys.argv[1:])
-    text="オブジェクトの削除について"
-    app.speech(text)
-    del app
-    app=Make_sound()
-    # text="".join(sys.argv[1:])
-    text="123"
-    app.speech(text)
+    # app=Make_sound(_who_speak=6)
+    # # app.vc.param.speed = 1.987
+    # # app.vc.param.pitch = 1.911
+    # # text="".join(sys.argv[1:])
+    # text="オブジェクトの削除について"
+    # app.speech(text)
+    # del app
+    # app=Make_sound(_who_speak=7)
+    # # text="".join(sys.argv[1:])
+    # text="123"
+    # app.speech(text)
+
+    with open(r"D:\Documents\投稿動画\素材\kiritan_exVOICE\0よく使うやつ\なにいってんだこいつ。.wav", 'rb') as f:
+        data = f.read()
+        winsound.PlaySound(data, winsound.SND_MEMORY)

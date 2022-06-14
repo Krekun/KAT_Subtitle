@@ -56,7 +56,7 @@ class KatOsc:
 		self.line_count = config.line_count
 
 		self.text_length =128 # Maximum length of text
-		self.sync_params_max = 16 # Maximum sync parameters
+		self.sync_params_max = 35 # Maximum sync parameters
 
 		self.pointer_count = int(self.text_length / self.sync_params)
 		self.pointer_clear = 255
