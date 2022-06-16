@@ -23,6 +23,7 @@ import katosc_kanji
 from hook_for_voiceroid2 import Make_sound
 # import re
 import winsound
+import requests
 # import win32gui
 # import win32con
 # import pyautogui
@@ -171,7 +172,7 @@ class KatOscApp:
 		if "音声オフ" in self.present_sentence:
 					self.bln.set(False)
 					self.set_text("")
-		if "？" in self.present_sentence or "。" in self.present_sentence:
+		if "？" in self.present_sentence or "。" in self.present_sentence or "." in self.present_sentence or "?" in self.present_sentence:
 			if self.present_sentence==self.old_sentence:
 				pass
 			else:
@@ -181,12 +182,24 @@ class KatOscApp:
 					elif "ありがとうございます。" in self.present_sentence:
 						self.play_exvoice(r"D:\Documents\投稿動画\素材\kiritan_exVOICE\挨拶・相槌\ありがとうございます　興奮.wav")
 					else:
-						self.Make_sound.speech(self.gui_text.get(1.0, "end"))
+						##翻訳機能実装の試み
+						url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
+						# url=url0+self.gui_text.get(1.0, "end")+"&source=ja&target=en"
+						lang_from="ja"
+						lang_to="en"
+						url=url_base+self.gui_text.get(1.0, "end")+"&source="+lang_from+"&target="+lang_to
+						res=requests.get(url)
+						# res.text="テスト用"
+						self.present_sentence=res.text
+						self.Make_sound.speech(res.text)
+						self.kat.set_text(self.present_sentence)
+						self.kat.set_text(self.present_sentence)
+						# time.sleep(3)#ここなんとかしたい　フリーズっぽい
 				if "音声オン" in self.present_sentence:
 					self.bln.set(True)
 				self.old_sentence=self.present_sentence
-			time.sleep(3)#ここなんとかしたい　フリーズっぽい
-			self.set_text("")
+			time.sleep(2)#ここなんとかしたい　フリーズっぽい
+			# self.set_text("")
 
 	# Gets the effective padded length of a line
 	def _get_padded_length(self, text: str):
