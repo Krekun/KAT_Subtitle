@@ -1,0 +1,30 @@
+<h1><span id="final_span" class="final"></span></h1>    
+<script>
+    const recognition = new webkitSpeechRecognition()//ブラウザ内臓なのでキーいらない
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'ja'//言語指定
+    let sock = new WebSocket('ws://127.0.0.1:5001');
+    recognition.start()//開始処理
+    recognition.onresult = function(event) 
+    {
+    var final_transcript="";
+    var interim_transcript="";
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        final_transcript += event.results[i][0].transcript;
+      } else {
+        interim_transcript += event.results[i][0].transcript;
+      }
+    }
+    final_span.innerHTML =final_transcript;
+    if (final_transcript!=""){
+            console.log('socket open');
+            sock.send(final_transcript);
+}
+}
+
+//     recognition.onend = () => { //onresultで完了すると、接続が切れるため、.onendの場合、再度スタートをする。
+//     recognition.start()
+// }
+</script>

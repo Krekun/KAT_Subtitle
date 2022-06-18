@@ -31,7 +31,7 @@ import asyncio
 import vosk_rec
 import queue
 class KatOscApp:
-	def __init__(self,loop=None,queue=None,_use_vosk=False):
+	def __init__(self,loop=None,queue=None,_use_vosk=False,_use_chrome=False):
 		self.kat = katosc_kanji.KatOsc(loop=loop)
 		self.Make_sound=Make_sound(_who_speak=6)
 		self.text_length = self.kat.text_length
@@ -40,6 +40,7 @@ class KatOscApp:
 		self.old_sentence=""
 		self.queue=queue
 		self._use_vosk=_use_vosk
+		self._use_chrome=_use_chrome
 		# self.p = re.compile('[a-zA-Z]+$')
 		# --------------
 		# GUI Setup
@@ -103,12 +104,15 @@ class KatOscApp:
 		if _use_vosk==True:
 			thread_vosk=threading.Thread(target=self.vosk_to_KAT)
 			thread_vosk.start()
+		if _use_chrome==True:
+			thread_chrome=threading.Thread(target=self.chrome_to_KAT)
+			thread_chrome.start()
 		# thread_main=threading.Thread(target=self.window.mainloop)
 		# thread_main.start()
 		self.window.mainloop()
 			# self.foreground()
 		# Stop App
-		# self.kat.stop()
+		self.kat.stop()
 
 	# def foreground(self):
 	# 	hwnd = ctypes.windll.user32.FindWindowW("Subtiles for VRChat", 0)
@@ -129,9 +133,18 @@ class KatOscApp:
 		while True:
 			if not self.queue.empty():
 				var = self.queue.get().replace("\"","")
-				print(var)
+				print(1,var)
+				# self.gui_text.insert(0,var)
+				# self._limit_text_length()
+
+	def chrome_to_KAT(self):
+		print("Chrome Web speech API起動")
+		while True:
+			if not self.queue.empty():
+				var = self.queue.get().replace("\"","")
+				print(1,var)
 				self.set_text(var)
-				self._limit_text_length()
+				# self._limit_text_length()
 
 
 	# Set the text to any value

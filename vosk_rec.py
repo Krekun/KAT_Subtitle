@@ -34,7 +34,7 @@ class Vosk_rec():
                     if rec.AcceptWaveform(data):
                         temp=rec.Result().split(":")[1].strip('\"').strip("}").strip("/n").split(" ")
                         temp="".join(temp)
-                        print(temp)
+                        # print(temp)
                         self.q_sentence.put(temp)
                         # return "".join(temp)
                     else:
