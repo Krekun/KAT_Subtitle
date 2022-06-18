@@ -28,7 +28,7 @@ import requests
 import threading
 import asyncio
 import vosk_rec
-
+import queue
 class KatOscApp:
 	def __init__(self,loop=None,queue=None):
 		self.kat = katosc_kanji.KatOsc(loop=loop)
@@ -98,7 +98,11 @@ class KatOscApp:
 
 		# Start App
 		while True:
-			if not queue_in.empty():
+			if not queue.empty():
+				var = queue.get()
+				print(var)
+				self.Make_sound.speech(var)
+
 
 		# self.window.mainloop()
 			# self.foreground()
@@ -219,8 +223,9 @@ class KatOscApp:
 
 if __name__ == "__main__":
 	# thread1=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop()})
-	thread2=threading.Thread(target=vosk_rec.Vosk_rec)
-	thread2.start()
+	# thread2=threading.Thread(target=vosk_rec.Vosk_rec)
+	# thread2.start()
 	# thread1.start()
-	thread3=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop()})
+	q_sentence=queue.Queue()
+	thread3=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop(),"queue":q_sentence})
 	thread3.start()

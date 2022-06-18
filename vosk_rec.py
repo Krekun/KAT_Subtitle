@@ -14,7 +14,7 @@ class Vosk_rec():
         self.model=vosk.Model("model")
         #これなら動く　なぜかモデルの読み込みに失敗していたのでこうなった。
         #websocketで渡してもいいし
-        thread1=threading.Thread(target=KatOscApp.KatOscApp,kwargs={"loop":asyncio.get_event_loop()})
+        thread1=threading.Thread(target=KatOscApp.KatOscApp,kwargs={"loop":asyncio.get_event_loop(),"queue":self.q_sentence})
         thread1.start()
         thread2=threading.Thread(target=self.recognize)
         thread2.start()
