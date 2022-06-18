@@ -145,7 +145,15 @@ class KatOscApp:
 				print(1,var)
 				self.set_text(var)
 				# self._limit_text_length()
-
+	def translate(self):
+		print("翻訳機能オン")
+		##翻訳機能実装の試み
+		# url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
+		# url=url_base+self.gui_text.get(1.0, "end")+"&source=ja&target=en"
+		# lang_from="ja"
+		# lang_to="en"
+		# url=url_base+self.gui_text.get(1.0, "end")+"&source="+lang_from+"&target="+lang_to
+		# res=requests.get(url)
 
 	# Set the text to any value
 	def set_text(self, text: str):
@@ -210,16 +218,7 @@ class KatOscApp:
 						self.play_exvoice(r"D:\Documents\投稿動画\素材\kiritan_exVOICE\0よく使うやつ\なにいってんだこいつ。.wav")
 					elif "ありがとうございます。" in self.present_sentence:
 						self.play_exvoice(r"D:\Documents\投稿動画\素材\kiritan_exVOICE\挨拶・相槌\ありがとうございます　興奮.wav")
-					else:
-						##翻訳機能実装の試み
-						# url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
-						# url=url0+self.gui_text.get(1.0, "end")+"&source=ja&target=en"
-						# lang_from="ja"
-						# lang_to="en"
-						# url=url_base+self.gui_text.get(1.0, "end")+"&source="+lang_from+"&target="+lang_to
-						# res=requests.get(url)
-						# # res.text="テスト用"
-						# self.present_sentence=res.text
+					else:						
 						self.Make_sound.speech(self.present_sentence)
 						# self.kat.set_text(self.present_sentence)
 						# self.kat.set_text(self.present_sentence)

@@ -23,7 +23,7 @@ class Make_sound():
             # Load Voice
             self.voice_list =self.vc.listVoices()
             if 0 < len(self.voice_list):
-                print(self.voice_list)
+                # print(self.voice_list)
                 self.vc.loadVoice(self.voice_list[_who_speak])
             else:
                 raise Exception("No voice library")
@@ -35,6 +35,7 @@ class Make_sound():
             self.vc.param.pauseLong = 100
             self.vc.param.pauseSentence = 200
             self.vc.param.masterVolume = 1.123
+            print("Voiceroid2読み込み成功")
             
     def speech(self,text):
         # Text to speech
