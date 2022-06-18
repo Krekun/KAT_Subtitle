@@ -12,8 +12,8 @@ class Vosk_rec():
         self.q = queue.Queue()
         self.q_sentence=queue.Queue()
         self.model=vosk.Model("model")
-        #これなら動く　なぜかモデルの読み込みに失敗していたのでこうなった。
-        #websocketで渡してもいいし
+        #Thread1:Run KatOsc queue keeps sentences to say
+        #Thread2:Start recognize
         thread1=threading.Thread(target=KatOscApp.KatOscApp,kwargs={"loop":asyncio.get_event_loop(),"queue":self.q_sentence})
         thread1.start()
         thread2=threading.Thread(target=self.recognize)
@@ -55,5 +55,3 @@ class Vosk_rec():
 
 if __name__=="__main__":
     app=Vosk_rec()
-    # app.recognize()
-    # pass

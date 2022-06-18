@@ -16,6 +16,7 @@
 
 
 from ast import arg
+from concurrent.futures import thread
 from tkinter import Tk, Text, Button,Checkbutton,BooleanVar
 import math
 import sys
@@ -30,13 +31,15 @@ import asyncio
 import vosk_rec
 import queue
 class KatOscApp:
-	def __init__(self,loop=None,queue=None):
+	def __init__(self,loop=None,queue=None,_use_vosk=False):
 		self.kat = katosc_kanji.KatOsc(loop=loop)
 		self.Make_sound=Make_sound(_who_speak=6)
 		self.text_length = self.kat.text_length
 		self.line_length = self.kat.line_length
 		self.line_count = self.kat.line_count
 		self.old_sentence=""
+		self.queue=queue
+		self._use_vosk=_use_vosk
 		# self.p = re.compile('[a-zA-Z]+$')
 		# --------------
 		# GUI Setup
@@ -97,14 +100,11 @@ class KatOscApp:
 		# self.gui_voice.grid(column = 1, row = 0, padx = 0, pady = 0)
 
 		# Start App
-		while True:
-			if not queue.empty():
-				var = queue.get()
-				print(var)
-				self.Make_sound.speech(var)
-
-
-		# self.window.mainloop()
+		thread_vosk=threading.Thread(target=self.vosk_to_KAT)
+		thread_vosk.start()
+		# thread_main=threading.Thread(target=self.window.mainloop)
+		# thread_main.start()
+		self.window.mainloop()
 			# self.foreground()
 		# Stop App
 		# self.kat.stop()
@@ -122,6 +122,15 @@ class KatOscApp:
 	# 	win32gui.SetForegroundWindow(hwnd)
 	# 	pyautogui.moveTo(left+60, top + 10)
 	# 	pyautogui.click()
+
+	def vosk_to_KAT(self):
+		print("vosk_rec起動")
+		while True:
+			if not self.queue.empty():
+				var = self.queue.get().replace("\"","")
+				print(var)
+				self.set_text(var)
+				self._limit_text_length()
 
 
 	# Set the text to any value
@@ -204,7 +213,7 @@ class KatOscApp:
 				if "音声オン" in self.present_sentence:
 					self.bln.set(True)
 				self.old_sentence=self.present_sentence
-			# time.sleep(4)#ここなんとかしたい　フリーズっぽい
+			time.sleep(2)#ここなんとかしたい　フリーズっぽい
 			self.set_text("")
 
 	# Gets the effective padded length of a line
