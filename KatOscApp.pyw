@@ -145,6 +145,7 @@ class KatOscApp:
 				print(1,var)
 				self.set_text(var)
 				# self._limit_text_length()
+				
 	def translate(self):
 		print("翻訳機能オン")
 		##翻訳機能実装の試み
