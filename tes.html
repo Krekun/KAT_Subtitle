@@ -1,0 +1,23 @@
+<h1><p id="check"></p>
+<script>
+const  url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
+var lang_from="ja"
+var lang_to="en"
+var final_transcript="ネットワーク経由でリクエスト送信"
+var url=url_base+final_transcript+"&source="+lang_from+"&target="+lang_to
+
+let xhr = new XMLHttpRequest();
+xhr.open('GET', url);
+xhr.send();
+
+xhr.onload=function(){
+    if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
+    alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+  } else { // show the result
+    // alert(`${xhr.response}`); // responseText is the server
+//   }
+    // console.log(url);
+    check.innerHTML =xhr.response;
+}
+}
+</script>
