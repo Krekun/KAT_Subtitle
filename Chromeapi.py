@@ -15,7 +15,7 @@ class Websocket():
         server.set_fn_message_received(self.message_received)
         server.run_forever()
     def new_client(self,client, server):
-        print ("new_client:", client['address'])
+        print ("接続しました")
 
     def message_received(self,client, server, message):
         # print (message)
