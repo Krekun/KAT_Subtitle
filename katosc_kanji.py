@@ -41,7 +41,7 @@ class KatOscConfig:
 
 
 class KatOsc:
-	def __init__(self, config: KatOscConfig = KatOscConfig()):
+	def __init__(self,loop=None,config: KatOscConfig = KatOscConfig()):
 		self.osc_ip = config.osc_ip
 		self.osc_port = config.osc_port
 
@@ -235,8 +235,9 @@ class KatOsc:
 			self.osc_dispatcher = dispatcher.Dispatcher()
 			self.osc_dispatcher.map(self.osc_parameter_prefix + self.param_sync + "*", self.osc_server_handler_char)
 			self.osc_dispatcher.map(self.osc_avatar_change_path + "*", self.osc_server_handler_avatar)
-
-			self.osc_server = osc_server.ThreadingOSCUDPServer((self.osc_server_ip, self.osc_server_port), self.osc_dispatcher, asyncio.get_event_loop())
+			if loop==None:
+				loop=asyncio.get_event_loop()
+			self.osc_server = osc_server.ThreadingOSCUDPServer((self.osc_server_ip, self.osc_server_port), self.osc_dispatcher, loop)
 			threading.Thread(target = self.osc_server_start, daemon = True).start()
 
 		# Start timer loop

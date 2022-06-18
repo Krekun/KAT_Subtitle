@@ -15,6 +15,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+from ast import arg
 from tkinter import Tk, Text, Button,Checkbutton,BooleanVar
 import math
 import sys
@@ -24,14 +25,13 @@ from hook_for_voiceroid2 import Make_sound
 # import re
 import winsound
 import requests
-# import win32gui
-# import win32con
-# import pyautogui
-# import ctypes
+import threading
+import asyncio
+import vosk_rec
 
 class KatOscApp:
-	def __init__(self):
-		self.kat = katosc_kanji.KatOsc()
+	def __init__(self,loop=None,queue=None):
+		self.kat = katosc_kanji.KatOsc(loop=loop)
 		self.Make_sound=Make_sound(_who_speak=6)
 		self.text_length = self.kat.text_length
 		self.line_length = self.kat.line_length
@@ -97,11 +97,13 @@ class KatOscApp:
 		# self.gui_voice.grid(column = 1, row = 0, padx = 0, pady = 0)
 
 		# Start App
-		self.window.mainloop()
-		self.foreground()
+		while True:
+			if not queue_in.empty():
 
+		# self.window.mainloop()
+			# self.foreground()
 		# Stop App
-		self.kat.stop()
+		# self.kat.stop()
 
 	# def foreground(self):
 	# 	hwnd = ctypes.windll.user32.FindWindowW("Subtiles for VRChat", 0)
@@ -183,23 +185,23 @@ class KatOscApp:
 						self.play_exvoice(r"D:\Documents\投稿動画\素材\kiritan_exVOICE\挨拶・相槌\ありがとうございます　興奮.wav")
 					else:
 						##翻訳機能実装の試み
-						url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
+						# url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
 						# url=url0+self.gui_text.get(1.0, "end")+"&source=ja&target=en"
-						lang_from="ja"
-						lang_to="en"
-						url=url_base+self.gui_text.get(1.0, "end")+"&source="+lang_from+"&target="+lang_to
-						res=requests.get(url)
-						# res.text="テスト用"
-						self.present_sentence=res.text
-						self.Make_sound.speech(res.text)
-						self.kat.set_text(self.present_sentence)
-						self.kat.set_text(self.present_sentence)
+						# lang_from="ja"
+						# lang_to="en"
+						# url=url_base+self.gui_text.get(1.0, "end")+"&source="+lang_from+"&target="+lang_to
+						# res=requests.get(url)
+						# # res.text="テスト用"
+						# self.present_sentence=res.text
+						self.Make_sound.speech(self.present_sentence)
+						# self.kat.set_text(self.present_sentence)
+						# self.kat.set_text(self.present_sentence)
 						# time.sleep(3)#ここなんとかしたい　フリーズっぽい
 				if "音声オン" in self.present_sentence:
 					self.bln.set(True)
 				self.old_sentence=self.present_sentence
-			time.sleep(2)#ここなんとかしたい　フリーズっぽい
-			# self.set_text("")
+			# time.sleep(4)#ここなんとかしたい　フリーズっぽい
+			self.set_text("")
 
 	# Gets the effective padded length of a line
 	def _get_padded_length(self, text: str):
@@ -216,4 +218,9 @@ class KatOscApp:
 
 
 if __name__ == "__main__":
-	kat_osc_app = KatOscApp()
+	# thread1=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop()})
+	thread2=threading.Thread(target=vosk_rec.Vosk_rec)
+	thread2.start()
+	# thread1.start()
+	thread3=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop()})
+	thread3.start()
