@@ -100,8 +100,9 @@ class KatOscApp:
 		# self.gui_voice.grid(column = 1, row = 0, padx = 0, pady = 0)
 
 		# Start App
-		thread_vosk=threading.Thread(target=self.vosk_to_KAT)
-		thread_vosk.start()
+		if _use_vosk==True:
+			thread_vosk=threading.Thread(target=self.vosk_to_KAT)
+			thread_vosk.start()
 		# thread_main=threading.Thread(target=self.window.mainloop)
 		# thread_main.start()
 		self.window.mainloop()
@@ -228,13 +229,8 @@ class KatOscApp:
 			data = f.read()
 			winsound.PlaySound(data, winsound.SND_MEMORY)
 
-
-
 if __name__ == "__main__":
-	# thread1=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop()})
-	# thread2=threading.Thread(target=vosk_rec.Vosk_rec)
-	# thread2.start()
-	# thread1.start()
-	q_sentence=queue.Queue()
-	thread3=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop(),"queue":q_sentence})
-	thread3.start()
+	app=KatOscApp()
+	# q_sentence=queue.Queue()
+	# thread3=threading.Thread(target=KatOscApp,kwargs={"loop":asyncio.get_event_loop(),"queue":q_sentence})
+	# thread3.start()

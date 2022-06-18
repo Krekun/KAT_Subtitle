@@ -14,16 +14,13 @@ class Vosk_rec():
         self.model=vosk.Model("model")
         #Thread1:Run KatOsc queue keeps sentences to say
         #Thread2:Start recognize
-        thread1=threading.Thread(target=KatOscApp.KatOscApp,kwargs={"loop":asyncio.get_event_loop(),"queue":self.q_sentence})
+        thread1=threading.Thread(target=KatOscApp.KatOscApp,kwargs={"loop":asyncio.get_event_loop(),"queue":self.q_sentence,"_use_vosk":True})
         thread1.start()
         thread2=threading.Thread(target=self.recognize)
         thread2.start()
 
-        # self.recognize()
-
     def recognize(self):
         try:
-
             samplerate=None
             with sd.RawInputStream(samplerate=samplerate, blocksize = 8000, device=None, dtype='int16',
                                         channels=1, callback=self.callback):
