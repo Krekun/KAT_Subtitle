@@ -134,7 +134,7 @@ class KatOscApp:
 			if not self.queue.empty():
 				var = self.queue.get().replace("\"","")
 				print(1,var)
-				# self.gui_text.insert(0,var)
+				self.set_text(var)
 				# self._limit_text_length()
 
 	def chrome_to_KAT(self):
