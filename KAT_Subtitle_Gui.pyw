@@ -14,15 +14,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from tkinter import Tk, Text, Button
+from tkinter import Tk, Text, Button,messagebox
 import math
 import time
-import KAT_Subtitle_Lib 
+import KAT_Subtitle_Lib
+import KAT_Subtitle_Websocket
+import KAT_Subtitle_server
 import threading
+import queue
+import sys
+import os
 class KAT_Subtitle_Gui:
-	def __init__(self,loop=None,queue=None,_use_chrome=False):
+	def __init__(self,loop=None,queue_sentence=None,_use_chrome=False):
+		os.chdir(os.path.dirname(os.path.abspath(__file__)))
 		self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop)
-		
+		self.q_sentence=queue.Queue()
+		Threading_chrome=threading.Thread(target=KAT_Subtitle_Websocket.Websocket,kwargs={"queue":self.q_sentence})
+		Threading_chrome.start()
+		Threading_sever=threading.Thread(target=KAT_Subtitle_server.localserver)
+		Threading_sever.start()
 		self.text_length = self.kat.text_length
 		self.line_length = self.kat.line_length
 		self.line_count = self.kat.line_count
@@ -68,18 +78,25 @@ class KAT_Subtitle_Gui:
 		if _use_chrome==True:
 			thread_chrome=threading.Thread(target=self.chrome_to_KAT)
 			thread_chrome.start()
+		self.window.protocol("WM_DELETE_WINDOW",self.close_window)
 		self.window.mainloop()
 		# Stop App
+		sys.exit()
 		self.kat.stop()
+
+	def close_window(self):
+		if messagebox.askokcancel("確認", "本当に閉じていいですか？"):
+			# sys.exit()
+			self.window.destroy()
 
 	#For Chrome  web speech API
 	def chrome_to_KAT(self):
-		print("Chrome Web speech API起動")
+		# print("Chrome Web speech API起動")
 		while True:
-			if not self.queue.empty():
-				var = self.queue.get().replace("\"","")
-				print(1,var)
+			if not self.q_sentence.empty():
+				var = self.q_sentence.get().replace("\"","")
 				self.set_text(var)
+			time.sleep(1)
 
 	# Set the text to any value
 	def set_text(self, text: str):
@@ -138,4 +155,4 @@ class KAT_Subtitle_Gui:
 		return self.line_length * lines
 
 if __name__ == "__main__":
-	app=KAT_Subtitle_Gui()
+	app=KAT_Subtitle_Gui(_use_chrome=True)

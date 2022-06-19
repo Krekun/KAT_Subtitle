@@ -7,9 +7,9 @@ import KAT_Subtitle_server
 import webbrowser
 
 class Websocket():
-    def __init__(self) -> None:
-        self.q = queue.Queue()
-        self.q_sentence=queue.Queue()
+    def __init__(self,queue=None) -> None:
+        # self.q = queue.Queue()
+        self.q_sentence=queue
         # thread1=threading.Thread(target=KAT_Subtitle_Gui.KAT_Subtitle_Gui,kwargs={"loop":asyncio.get_event_loop(),"queue":self.q_sentence,"_use_chrome":True})
         # thread1.start()
         server = WebsocketServer(port=5001, host='127.0.0.1')
@@ -23,11 +23,11 @@ class Websocket():
 
 
     def new_client(self,client, server):
-        print ("接続しました")
+        # print ("WebSocket 起動")
+        pass
 
 
     def message_received(self,client, server, message):
-        print (message)
         self.q_sentence.put(message)
 
 if __name__=="__main__":

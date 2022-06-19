@@ -20,6 +20,7 @@ from threading import Timer
 from pythonosc import udp_client, osc_server, dispatcher
 import math, asyncio, threading
 import csv
+import os
 
 
 class KatOscConfig:
@@ -40,6 +41,7 @@ class KatOscConfig:
 
 class KatOsc:
 	def __init__(self,loop=None,config: KatOscConfig = KatOscConfig()):
+		os.chdir(os.path.dirname(os.path.abspath(__file__)))
 		self.osc_ip = config.osc_ip
 		self.osc_port = config.osc_port
 
