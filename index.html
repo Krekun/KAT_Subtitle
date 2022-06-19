@@ -47,8 +47,12 @@
         </div>
         <p>
         <div id="div_language">
+          翻訳元言語を選択してください
           <select id="select_language" onchange="updateCountry()"></select>
           <select id="select_dialect"></select>
+        </div>
+        <div id="div_language">
+          翻訳先言語を選択してください
         </div>
       </div>
       <div id="results">
@@ -141,7 +145,8 @@
     
     const  url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
     let xhr = new XMLHttpRequest();
-    
+    let sock = new WebSocket('ws://127.0.0.1:5001');
+    let bouyomiChanClient = new BouyomiChanClient();//棒読みちゃん呼び出し
 
     var final_transcript = '';
     var recognizing = false;
@@ -182,7 +187,8 @@
         }
       };
     
-      recognition.onend = function() {
+      recognition.onend = function() 
+      {
         recognizing = false;
         if (ignore_onend) {
           return;
@@ -199,14 +205,12 @@
           range.selectNode(document.getElementById('final_span'));
           window.getSelection().addRange(range);
         }
-        if (create_email) {
-          create_email = false;
-          createEmail();
-        }
-      };
-    
+        
+      }
+
       recognition.onresult = function(event) {
         var interim_transcript = '';
+        var final_transcript='';
         for (var i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             final_transcript += event.results[i][0].transcript;
@@ -220,6 +224,29 @@
         if (final_transcript || interim_transcript) {
           showButtons('inline-block');
         }
+        if (final_transcript!=""){
+          var lang_from=select_dialect.value;
+          // var lang_to="cmn-Hans-CN"
+          var lang_to="en"
+          var url=url_base+final_transcript+"&source="+lang_from+"&target="+lang_to
+          xhr.open('GET', url);
+          xhr.send();
+          xhr.onload=function(){
+              if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
+              alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+            } else { 
+              console.log(url);
+              translation_span.innerHTML =xhr.response;
+              console.log('socket open');
+              var send_text=xhr.response;
+              // var send_text=final_transcript;
+              sock.send(send_text);//KAT に文章を送る
+              bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
+          }
+
+        };
+        }
+
       };
     }
     
