@@ -37,22 +37,21 @@
         <span id="interim_span" class="interim"></span>
         <p>
       </div>
-      <div class="center">
-        <div class="sidebyside" style="text-align:right">
-          <button id="copy_button" class="button" onclick="copyButton()">
-            Copy and Paste</button>
-          <div id="copy_info" class="info">
-            Press Control-C to copy text.<br>(Command-C on Mac.)
-          </div>
-        </div>
         <p>
         <div id="div_language">
-          翻訳元言語を選択してください
+          聞き取る言語
           <select id="select_language" onchange="updateCountry()"></select>
           <select id="select_dialect"></select>
         </div>
         <div id="div_language">
-          翻訳先言語を選択してください
+          翻訳元言語
+          <select id="select_language2" onchange="updateCountry2()"></select>
+          <select id="select_dialect2"></select>
+        </div>
+        <div id="div_language">
+          翻訳先言語
+          <select id="select_language3" onchange="updateCountry3()"></select>
+          <select id="select_dialect3"></select>
         </div>
       </div>
       <div id="results">
@@ -123,6 +122,118 @@
                          ['yue-Hant-HK', '粵語 (香港)']],
      ['日本語',           ['ja-JP']],
      ['Lingua latīna',   ['la']]];
+
+     var langs2 =
+     [['Afrikaans',       ['af']],
+      ['Albanian',       ['sq']],
+      ['Amharic',       ['am']],
+      ['Arabic',       ['ar']],
+      ['Armenian',       ['hy']],
+      ['Azerbaijani',       ['az']],
+      ['Basque',       ['eu']],
+      ['Belarusian',       ['be']],
+      ['Bengali',       ['bn']],
+      ['Bosnian',       ['bs']],
+      ['Bulgarian',       ['bg']],
+      ['Catalan',       ['ca']],
+      ['Cebuano',       ['ceb']],
+      ['Chinese (Simplified)',       ['zh-CN']],
+      ['Chinese (Traditional)',       ['zh-TW']],
+      ['Corsican',       ['co']],
+      ['Croatian',       ['hr']],
+      ['Czech',       ['cs']],
+      ['Danish',       ['da']],
+      ['Dutch',       ['nl']],
+      ['English',       ['en']],
+      ['Esperanto',       ['eo']],
+      ['Estonian',       ['et']],
+      ['Finnish',       ['fi']],
+      ['French',       ['fr']],
+      ['Frisian',       ['fy']],
+      ['Galician',       ['gl']],
+      ['Georgian',       ['ka']],
+      ['German',       ['de']],
+      ['Greek',       ['el']],
+      ['Gujarati',       ['gu']],
+      ['Haitian Creole',       ['ht']],
+      ['Hausa',       ['ha']],
+      ['Hawaiian',       ['haw']],
+      ['Hebrew',       ['he']],
+      ['Hindi',       ['hi']],
+      ['Hmong',       ['hmn']],
+      ['Hungarian',       ['hu']],
+      ['Icelandic',       ['is']],
+      ['Igbo',       ['ig']],
+      ['Indonesian',       ['id']],
+      ['Irish',       ['ga']],
+      ['Italian',       ['it']],
+      ['Japanese',       ['ja']],
+      ['Javanese',       ['jv']],
+      ['Kannada',       ['kn']],
+      ['Kazakh',       ['kk']],
+      ['Khmer',       ['km']],
+      ['Kinyarwanda',       ['rw']],
+      ['Korean',       ['ko']],
+      ['Kurdish',       ['ku']],
+      ['Kyrgyz',       ['ky']],
+      ['Lao',       ['lo']],
+      ['Latin',       ['la']],
+      ['Latvian',       ['lv']],
+      ['Lithuanian',       ['lt']],
+      ['Luxembourgish',       ['lb']],
+      ['Macedonian',       ['mk']],
+      ['Malagasy',       ['mg']],
+      ['Malay',       ['ms']],
+      ['Malayalam',       ['ml']],
+      ['Maltese',       ['mt']],
+      ['Maori',       ['mi']],
+      ['Marathi',       ['mr']],
+      ['Mongolian',       ['mn']],
+      ['Myanmar (Burmese)',       ['my']],
+      ['Nepali',       ['ne']],
+      ['Norwegian',       ['no']],
+      ['Nyanja (Chichewa)',       ['ny']],
+      ['Odia (Oriya)',       ['or']],
+      ['Pashto',       ['ps']],
+      ['Persian',       ['fa']],
+      ['Polish',       ['pl']],
+      ['Portuguese (Portugal, Brazil)',       ['pt']],
+      ['Punjabi',       ['pa']],
+      ['Romanian',       ['ro']],
+      ['Russian',       ['ru']],
+      ['Samoan',       ['sm']],
+      ['Scots Gaelic',       ['gd']],
+      ['Serbian',       ['sr']],
+      ['Sesotho',       ['st']],
+      ['Shona',       ['sn']],
+      ['Sindhi',       ['sd']],
+      ['Sinhala (Sinhalese)',       ['si']],
+      ['Slovak',       ['sk']],
+      ['Slovenian',       ['sl']],
+      ['Somali',       ['so']],
+      ['Spanish',       ['es']],
+      ['Sundanese',       ['su']],
+      ['Swahili',       ['sw']],
+      ['Swedish',       ['sv']],
+      ['Tagalog (Filipino)',       ['tl']],
+      ['Tajik',       ['tg']],
+      ['Tamil',       ['ta']],
+      ['Tatar',       ['tt']],
+      ['Telugu',       ['te']],
+      ['Thai',       ['th']],
+      ['Turkish',       ['tr']],
+      ['Turkmen',       ['tk']],
+      ['Ukrainian',       ['uk']],
+      ['Urdu',       ['ur']],
+      ['Uyghur',       ['ug']],
+      ['Uzbek',       ['uz']],
+      ['Vietnamese',       ['vi']],
+      ['Welsh',       ['cy']],
+      ['Xhosa',       ['xh']],
+      ['Yiddish',       ['yi']],
+      ['Yoruba',       ['yo']],
+      ['Zulu',       ['zu']]
+    ];
     
     for (var i = 0; i < langs.length; i++) {
       select_language.options[i] = new Option(langs[i][0], i);
@@ -143,6 +254,45 @@
       select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
     }
     
+    for (var i = 0; i < langs2.length; i++) {
+    select_language2.options[i] = new Option(langs2[i][0], i);
+        }
+        select_language2.selectedIndex = 43;
+        updateCountry2();
+        select_dialect2.selectedIndex = 0;
+        showInfo('info_start');
+        
+    function updateCountry2() {
+      for (var i = select_dialect2.options.length - 1; i >= 0; i--) {
+        select_dialect2.remove(i);
+      }
+      var list = langs2[select_language2.selectedIndex];
+      for (var i = 1; i < list.length; i++) {
+        select_dialect2.options.add(new Option(list[i][1], list[i][0]));
+      }
+      select_dialect2.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+    }
+
+    for (var i = 0; i < langs2.length; i++) {
+    select_language3.options[i] = new Option(langs2[i][0], i);
+        }
+        select_language3.selectedIndex = 20;
+        updateCountry3();
+        select_dialect3.selectedIndex = 0;
+        showInfo('info_start');
+        
+    function updateCountry3() {
+      for (var i = select_dialect3.options.length - 1; i >= 0; i--) {
+        select_dialect3.remove(i);
+      }
+      var list = langs2[select_language3.selectedIndex];
+      for (var i = 1; i < list.length; i++) {
+        select_dialect3.options.add(new Option(list[i][1], list[i][0]));
+      }
+      select_dialect3.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+    }
+
+
     const  url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
     let xhr = new XMLHttpRequest();
     let sock = new WebSocket('ws://127.0.0.1:5001');
@@ -225,10 +375,10 @@
           showButtons('inline-block');
         }
         if (final_transcript!=""){
-          var lang_from=select_dialect.value;
+          var lang_from=select_dialect2.value;
           // var lang_to="cmn-Hans-CN"
-          var lang_to="en"
-          var url=url_base+final_transcript+"&source="+lang_from+"&target="+lang_to
+          var lang_to=select_dialect3.value;
+          var url=url_base+final_transcript+"&source="+lang_from+"&target="+lang_to;
           xhr.open('GET', url);
           xhr.send();
           xhr.onload=function(){
@@ -266,15 +416,6 @@
       return s.replace(first_char, function(m) { return m.toUpperCase(); });
     }
     
-    function copyButton() {
-      if (recognizing) {
-        recognizing = false;
-        recognition.stop();
-      }
-      copy_button.style.display = 'none';
-      copy_info.style.display = 'inline-block';
-      showInfo('');
-    }
     
     function startButton(event) {
       if (recognizing) {
@@ -312,8 +453,6 @@
         return;
       }
       current_style = style;
-      copy_button.style.display = style;
-      copy_info.style.display = 'none';
     }
     </script> 
 </body>
