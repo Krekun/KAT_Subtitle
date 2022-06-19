@@ -5,7 +5,9 @@ dist/
 KatOscApp.build
 KatOscApp.exe
 KatOscApp.cmd
+memo.txt
 build.bat
 build.sh
 *.shader
 pyvcroid2
+使わない
