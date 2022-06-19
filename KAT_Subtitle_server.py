@@ -8,12 +8,12 @@ import os
 
 class localserver():
     def __init__(self) -> None:
-        PORT = 8001
+        PORT = 8002
         Handler = http.server.SimpleHTTPRequestHandler
 
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             # print("serving at port", PORT)
-            url="http://localhost:8001/"
+            url="http://localhost:8002/"
             webbrowser.open(url)
             # os.system("taskkill /im chrome.exe /f")
             # print("サーバー起動")

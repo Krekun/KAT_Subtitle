@@ -94,7 +94,7 @@ class KAT_Subtitle_Gui:
 			if not self.q_sentence.empty():
 				var = self.q_sentence.get().replace("\"","")
 				self.set_text(var)
-			time.sleep(1)
+				time.sleep(3)
 
 	# Set the text to any value
 	def set_text(self, text: str):
