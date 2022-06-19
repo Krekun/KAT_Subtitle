@@ -354,22 +354,23 @@
     
       recognition.onend = function() 
       {
-        recognizing = false;
-        if (ignore_onend) {
-          return;
-        }
-        start_img.src = 'img/mic.gif';
-        if (!final_transcript) {
-          showInfo('info_start');
-          return;
-        }
-        showInfo('');
-        if (window.getSelection) {
-          window.getSelection().removeAllRanges();
-          var range = document.createRange();
-          range.selectNode(document.getElementById('final_span'));
-          window.getSelection().addRange(range);
-        }
+        recognition.start()
+        // recognizing = false;
+        // if (ignore_onend) {
+        //   return;
+        // }
+        // start_img.src = 'img/mic.gif';
+        // if (!final_transcript) {
+        //   showInfo('info_start');
+        //   return;
+        // }
+        // showInfo('');
+        // if (window.getSelection) {
+        //   window.getSelection().removeAllRanges();
+        //   var range = document.createRange();
+        //   range.selectNode(document.getElementById('final_span'));
+        //   window.getSelection().addRange(range);
+        // }
         
       }
 
