@@ -21,6 +21,8 @@ from pythonosc import udp_client, osc_server, dispatcher
 import math, asyncio, threading
 import csv
 import os
+from tkinter import messagebox
+import sys
 
 
 class KatOscConfig:
@@ -41,7 +43,7 @@ class KatOscConfig:
 
 class KatOsc:
 	def __init__(self,loop=None,config: KatOscConfig = KatOscConfig()):
-		os.chdir(os.path.dirname(os.path.abspath(__file__)))
+		os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 		self.osc_ip = config.osc_ip
 		self.osc_port = config.osc_port
 
@@ -72,9 +74,14 @@ class KatOsc:
 		self.osc_text = ""
 		self.target_text = ""
 		#Read convert list
-		with open("convertlist.csv","r",encoding="UTF") as f:
-			reader=csv.reader(f)
-			self.letters_list=[row for row in reader]
+		try:
+			with open("convertlist.csv","r",encoding="UTF") as f:
+				reader=csv.reader(f)
+				self.letters_list=[row for row in reader]
+		except:
+			message=os.getcwd()
+			messagebox.showwarning("エラー", message)
+			os._exit(1)
 		self.invalid_char = "?" # character used to replace invalid characters
 		self.keys = {
 			" " :0,

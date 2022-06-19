@@ -42,20 +42,21 @@
           聞き取る言語
           <select id="select_language" onchange="updateCountry()"></select>
           <select id="select_dialect"></select>
+          <!-- <label><input type="checkbox"  id="is_translate">翻訳する</label> -->
+          <input type="button" value="翻訳する" onclick="clickBtn1()" />
         </div>
-        <div id="div_language">
+        <div id="div_translate">
+          <hr>
           翻訳元言語
           <select id="select_language2" onchange="updateCountry2()"></select>
           <select id="select_dialect2"></select>
-        </div>
-        <div id="div_language">
           翻訳先言語
           <select id="select_language3" onchange="updateCountry3()"></select>
           <select id="select_dialect3"></select>
-        </div>
-      </div>
+
       <div id="results">
         <span id="translation_span" class="final"></span>
+      </div>
       </div>
   <!-- ////////////////////////////////////////////////////////////////////// -->
  <script>
@@ -292,12 +293,26 @@
       select_dialect3.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
     }
 
+    document.getElementById("div_translate").style.display ="none";
+    function clickBtn1(){
+          const div_translate =document.getElementById("div_translate");
+
+          if(div_translate .style.display=="block"){
+            // noneで非表示
+            div_translate .style.display ="none";
+            is_translate=false;
+          }else{
+            // blockで表示
+            div_translate .style.display ="block";
+            is_translate=true;
+          }
+        }
 
     const  url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
     let xhr = new XMLHttpRequest();
     let sock = new WebSocket('ws://127.0.0.1:5001');
     let bouyomiChanClient = new BouyomiChanClient();//棒読みちゃん呼び出し
-
+    var is_translate=false;
     var final_transcript = '';
     var recognizing = false;
     var ignore_onend;
@@ -375,6 +390,8 @@
           showButtons('inline-block');
         }
         if (final_transcript!=""){
+          if(is_translate)
+        {
           var lang_from=select_dialect2.value;
           // var lang_to="cmn-Hans-CN"
           var lang_to=select_dialect3.value;
@@ -389,16 +406,20 @@
               translation_span.innerHTML =xhr.response;
               console.log('socket open');
               var send_text=xhr.response;
-              // var send_text=final_transcript;
+              console.log(send_text);
+              sock.send(send_text);//KAT に文章を送る
+              bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
+          }}
+        }
+          else{
+              var send_text=final_transcript;
               sock.send(send_text);//KAT に文章を送る
               bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
           }
 
+          }
         };
         }
-
-      };
-    }
     
     function upgrade() {
       start_button.style.visibility = 'hidden';
