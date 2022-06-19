@@ -80,12 +80,10 @@ class KAT_Subtitle_Gui:
 			thread_chrome.start()
 		self.window.protocol("WM_DELETE_WINDOW",self.close_window)
 		self.window.mainloop()
-		# Stop App
-		sys.exit()
-		self.kat.stop()
 
 	def close_window(self):
 		if messagebox.askokcancel("確認", "本当に閉じていいですか？"):
+			os._exit(0)
 			# sys.exit()
 			self.window.destroy()
 

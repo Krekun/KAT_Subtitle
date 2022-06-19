@@ -1,6 +1,5 @@
 from websocket_server import WebsocketServer
 import threading
-import KAT_Subtitle_Gui
 import asyncio
 import queue
 import KAT_Subtitle_server
