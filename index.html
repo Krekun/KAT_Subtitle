@@ -8,7 +8,9 @@
 -->
 
 <meta charset="utf-8">
+
 <script src="js/bouyomichan_client.js"></script>
+<script src="js/setting.js"></script>
 <link rel="stylesheet" type="text/css" href="css/style.css">  
 <!-- <script src="js/recog.js"></script> -->
 </head>
@@ -313,7 +315,6 @@
           }
         }
 
-    const  url_base="https://script.google.com/macros/s/AKfycbwQQzNfDj9-Oou2-xTC7lrH6WbQakX2La89fVJ6z_i7XiX5WhoWUZIrbxDIFKkI6AzG/exec?text="
     let xhr = new XMLHttpRequest();
     let sock = new WebSocket('ws://127.0.0.1:5001');
     let bouyomiChanClient = new BouyomiChanClient();//棒読みちゃん呼び出し
