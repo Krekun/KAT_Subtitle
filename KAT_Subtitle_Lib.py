@@ -79,7 +79,7 @@ class KatOsc:
 				reader=csv.reader(f)
 				self.letters_list=[row for row in reader]
 		except:
-			message=os.getcwd()
+			message="Convertlistが見当たりません。"
 			messagebox.showwarning("エラー", message)
 			os._exit(1)
 		self.invalid_char = "?" # character used to replace invalid characters
@@ -241,9 +241,13 @@ class KatOsc:
 			self.osc_dispatcher.map(self.osc_avatar_change_path + "*", self.osc_server_handler_avatar)
 			if loop==None:
 				loop=asyncio.get_event_loop()
-			self.osc_server = osc_server.ThreadingOSCUDPServer((self.osc_server_ip, self.osc_server_port), self.osc_dispatcher, loop)
-			threading.Thread(target = self.osc_server_start, daemon = True).start()
-
+			try:
+				self.osc_server = osc_server.ThreadingOSCUDPServer((self.osc_server_ip, self.osc_server_port), self.osc_dispatcher, loop)
+				threading.Thread(target = self.osc_server_start, daemon = True).start()
+			except:
+				message="同時に複数の起動はできません。"
+				messagebox.showwarning("エラー", message)
+				os._exit(1)
 		# Start timer loop
 		self.osc_timer.start()
 
