@@ -3,8 +3,10 @@
 <title>KAT Subtitle</title>
 <!--
    TODO list
-・DeepLに対応させる
-・聞き取る言語と翻訳元を自動対応 
+・Use DeepL API
+・Change languges into English
+・Auto selecting the language used for translation
+・
 -->
 
 <meta charset="utf-8">
@@ -18,7 +20,7 @@
   <h1 class="center" id="headline">
       KAT Subtitle</h1>
       <div id="info">
-        <p id="info_start">マイクのアイコンをクリックしてから話し始めてください。</p>
+        <p id="info_start">Push microphone icon and speak.</p>
         <p id="info_speak_now">Speak now.</p>
         <p id="info_no_speech">No speech was detected. You may need to adjust your
           <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
@@ -46,18 +48,18 @@
       </div>
         <p>
         <div id="div_language">
-          聞き取る言語
+          Langugage
           <select id="select_language" onchange="updateCountry()"></select>
           <select id="select_dialect"></select>
           <!-- <label><input type="checkbox"  id="is_translate">翻訳する</label> -->
-          <input type="button" value="翻訳する" onclick="clickBtn1()" />
+          <input type="button" value="Translate" onclick="clickBtn1()" />
         </div>
         <div id="div_translate">
           <hr>
-          翻訳元言語
+          Translate from
           <select id="select_language2" onchange="updateCountry2()"></select>
           <select id="select_dialect2"></select>
-          翻訳先言語
+          Translate to
           <select id="select_language3" onchange="updateCountry3()"></select>
           <select id="select_dialect3"></select>
 
@@ -332,7 +334,6 @@
       recognition.interimResults = true;
     
       recognition.onstart = function() {
-        recognizing = true;
         showInfo('info_speak_now');
         start_img.src = 'images/mic-animate.gif';
       };
@@ -360,17 +361,23 @@
     
       recognition.onend = function() 
       {
+        if(recognizing){
         recognition.start()
+        }
+        else{
+          start_img.src = 'images/mic.gif';
+          showInfo('');
+        }
         // recognizing = false;
         // if (ignore_onend) {
         //   return;
         // }
-        // start_img.src = 'images/mic.gif';
+
         // if (!final_transcript) {
         //   showInfo('info_start');
         //   return;
         // }
-        // showInfo('');
+
         // if (window.getSelection) {
         //   window.getSelection().removeAllRanges();
         //   var range = document.createRange();
@@ -447,12 +454,14 @@
     
     function startButton(event) {
       if (recognizing) {
+        recognizing = false;
         recognition.stop();
         return;
       }
       final_transcript = '';
       recognition.lang = select_dialect.value;
       recognition.start();
+      recognizing = true;
       ignore_onend = false;
       final_span.innerHTML = '';
       interim_span.innerHTML = '';
