@@ -19,7 +19,7 @@ class Websocket():
         server.run_forever()
 
     def new_client(self,client, server):
-        print ("WebSocket 起動")
+        # print ("WebSocket 起動")
         pass
 
     def message_received(self,client, server, message):

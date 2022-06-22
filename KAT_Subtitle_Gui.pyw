@@ -19,12 +19,9 @@ import math
 import time
 import KAT_Subtitle_Lib
 import KAT_Subtitle_Websocket
-import KAT_Subtitle_server
 import threading
 import queue
-import sys
 import os
-import subprocess
 
 class KAT_Subtitle_Gui:
 	def __init__(self,loop=None,queue_sentence=None,_use_chrome=False):
@@ -39,8 +36,10 @@ class KAT_Subtitle_Gui:
 		self.old_sentence=""
 		self.queue=queue# for multi threading
 		self.max_letter_length=32 # max length Japanese:32
-		self.delay=0.25
 		self._use_chrome=_use_chrome
+		self.delay=0.25# 
+		if _use_chrome==True:
+			KAT_Subtitle_Lib.RepeatedTimer(self.delay, self.chrome_to_KAT)
 		# --------------
 		# GUI Setup
 		# --------------
@@ -75,9 +74,8 @@ class KAT_Subtitle_Gui:
 			height = 6
 		)
 		self.gui_clear.grid(column = 1, row = 0, padx = 0, pady = 0, sticky = "ne")
+
 		# Start App
-		if _use_chrome==True:
-			KAT_Subtitle_Lib.RepeatedTimer(self.delay, self.chrome_to_KAT)
 		self.window.protocol("WM_DELETE_WINDOW",self.close_window)
 		self.window.mainloop()
 
