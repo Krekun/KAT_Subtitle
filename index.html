@@ -405,6 +405,10 @@
         if (final_transcript!=""){
           if(is_translate)
         {
+          if(url_base==""){
+            alert("翻訳機能の利用には設定が必要です。\nReadmeを確認してください。")
+          }
+          else{
           var lang_from=select_dialect2.value;
           // var lang_to="cmn-Hans-CN"
           var lang_to=select_dialect3.value;
@@ -414,7 +418,8 @@
           xhr.onload=function(){
               if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
               alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
-            } else { 
+            } 
+            else { 
               console.log(url);
               translation_span.innerHTML =xhr.response;
               console.log('socket open');
@@ -422,8 +427,8 @@
               console.log(send_text);
               sock.send(send_text);//KAT に文章を送る
               bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
-          }}
-        }
+          }
+        }}}
           else{
               var send_text=final_transcript;
               sock.send(send_text);//KAT に文章を送る
