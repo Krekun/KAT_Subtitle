@@ -12,6 +12,7 @@ build.sh
 pyvcroid2
 使わない
 js/setting.js
+js/bouyomichan_client.js
 memo.txt
 langlist.csv
 convertlist.csv
