@@ -24,6 +24,8 @@ import threading
 import queue
 import sys
 import os
+import subprocess
+
 class KAT_Subtitle_Gui:
 	def __init__(self,loop=None,queue_sentence=None,_use_chrome=False):
 		os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -31,14 +33,13 @@ class KAT_Subtitle_Gui:
 		self.q_sentence=queue.Queue()
 		Threading_chrome=threading.Thread(target=KAT_Subtitle_Websocket.Websocket,kwargs={"queue":self.q_sentence})
 		Threading_chrome.start()
-		Threading_sever=threading.Thread(target=KAT_Subtitle_server.localserver)
-		Threading_sever.start()
 		self.text_length = self.kat.text_length
 		self.line_length = self.kat.line_length
 		self.line_count = self.kat.line_count
 		self.old_sentence=""
 		self.queue=queue# for multi threading
 		self.max_letter_length=32 # max length Japanese:32
+		self.delay=0.25
 		self._use_chrome=_use_chrome
 		# --------------
 		# GUI Setup
@@ -76,25 +77,19 @@ class KAT_Subtitle_Gui:
 		self.gui_clear.grid(column = 1, row = 0, padx = 0, pady = 0, sticky = "ne")
 		# Start App
 		if _use_chrome==True:
-			thread_chrome=threading.Thread(target=self.chrome_to_KAT)
-			thread_chrome.start()
+			KAT_Subtitle_Lib.RepeatedTimer(self.delay, self.chrome_to_KAT)
 		self.window.protocol("WM_DELETE_WINDOW",self.close_window)
 		self.window.mainloop()
 
 	def close_window(self):
 		if messagebox.askokcancel("確認", "本当に閉じていいですか？"):
 			os._exit(0)
-			# sys.exit()
-			self.window.destroy()
 
 	#For Chrome  web speech API
 	def chrome_to_KAT(self):
-		# print("Chrome Web speech API起動")
-		while True:
-			if not self.q_sentence.empty():
-				var = self.q_sentence.get().replace("\"","")
-				self.set_text(var)
-				time.sleep(3)
+		if not self.q_sentence.empty():
+			var = self.q_sentence.get().replace("\"","")
+			self.set_text(var)
 
 	# Set the text to any value
 	def set_text(self, text: str):

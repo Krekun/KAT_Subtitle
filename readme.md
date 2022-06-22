@@ -32,7 +32,7 @@ KAT_Subtitle.exeと同じ階層のフォルダにCharmap Makerで作成したCon
 
 ### 音声入力
 
-KAT_Subtitle.exeを起動すると、Chromeのウインドウとエディタが起動します。
+KAT_Subtitle.exeを起動すると、Chromeのウインドウ（http://localhost:8001/）　とエディタが起動します。
 
 ![image1](images/1.gif)
 
@@ -46,17 +46,39 @@ ChromeのウインドウはWeb Speech APIを用いた音声認識およびGoogle
 
 KAT Subtitleはタイピングによる入力にも採用しています。エディタ上に、直接文字を入力してください。文章の最後が「。」または「？」で終了した場合、エディタ上の文章はリセットされます。右側のClearボタンを押しても、テキストを消すことができます。
 
-Windows11をご利用の方は、windows11の標準音声入力をすることも可能です。文字入力欄を選択中にWindows+Hを押すと、音声入力が開始されます。音声入力の設定から句読点の自動挿入をオンにすると、文章が終わると自動的に入力内容がクリアされます。これにより一々文章を削除することなく、スムーズにしゃべり続けることができます。Web Speech APIとWindows11標準の音声入力の精度は大差ありませんので、お好みのほうをご利用ください。またいずれの音声入力も外部での音声認識を行っているため、部外者に内容が伝わる可能性があることをご留意ください。
+Windows11をご利用の方は、windows11の標準音声入力をすることも可能です。文字入力欄を選択中にWindows+Hを押すと、音声入力が開始されます。音声入力の設定から句読点の自動挿入をオンにすると、文章が終わると自動的に入力内容がクリアされます。これにより一々文章を削除することなく、スムーズにしゃべり続けることができます。
 
-### 翻訳
+Web Speech APIとWindows11標準の音声入力の精度は大差ありませんので、お好みのほうをご利用ください。またいずれの音声入力も外部での音声認識を行っているため、部外者に内容が伝わる可能性があることをご留意ください。
+
+### 翻訳（要設定）
 
 ![imager2](images/2.gif)
-KAT Subtileは日本語以外にも英語、ドイツ語、中国語、韓国語などの多くの言語に対応しています。翻訳にはGoogle App Scriptを利用します。
+
 Chromeのウインドウの画面の中央部、聞き取る言語の右側にあるプルダウンメニューから聞き取る言語を指定します。翻訳すると書かれたボタンをクリックすると翻訳に関する項目が現れます。翻訳元言語と翻訳先言語を指定してください。音声認識と翻訳では使用しているAPIが異なるため、手動で翻訳元言語は指定してください。
+
+
+翻訳機能は外部APIを利用している関係上、デフォルトでは機能せず、設定が必要です。現在対応しているAPIはGoogle App Scriptのみです。今後のアプッデートではDeep Lをはじめ、複数の翻訳APIに対応していきます。
+
+### Google App Scriptを用いた翻訳方法
+
+以下の記事にしたがい、翻訳用APIのURLを取得してください。
+
+[3 分で作る無料の翻訳 API with Google Apps Script \- Qiita](https://qiita.com/tanabee/items/c79c5c28ba0537112922)
+
+この記事に従うと下記のようなURLが取得できます。(このURLは実際には機能しません。)
+
+https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec?text=
+
+このURLをjsフォルダ下にあるsetting.jsに以下のように記入します。
+
+    const  url_base="https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec?text="
 
 ### 音声合成
 
-KAT Subtitleは[棒読みちゃん](https://chi.usamimi.info/Program/Application/BouyomiChan/)に対応しています。棒読みちゃんに[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を導入することで棒読みちゃんに発声させることができます。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。
+KAT Subtitleは[棒読みちゃん](https://chi.usamimi.info/Program/Application/BouyomiChan/)に対応しています。
+棒読みちゃん対応には[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用します。棒読みちゃん本体のプラグインの設定ができたら、bouyomichan_client.jsというファイルをjsフォルダ化に保存します。
+
+このプラグインを導入することで棒読みちゃんに発声させることができます。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。
 
 ## Q&A
 
@@ -66,15 +88,17 @@ A.OSCが有効になっているか・Convertlistが破損していないか・C
 
 Q.音声認識・翻訳されない
 
-A.ネットワークに問題があるか、過剰利用が原因でGoogleに寄生されいる可能性があります。
+A.ネットワークに問題があるか、過剰利用が原因でGoogleに規制されいる可能性があります。
 
 Q.Chromeの読み込みがいつまでも終わらない
 
-A.アプリを再起動してください。環境によってはローカルサーバーの立ち上げに問題が生じることがあります。ご自身でローカルサーバーを立てるか、index.htmlを直接chromeで開いてください。後者の場合は、Chromeが何回もマイクの使用許可を尋ねてくる可能性があります。これはChromeの仕様なので私では対応できかねます。
+A.アプリを再起動してください。KAT Subtitleではローカルサーバーを利用します。これはChromeの関係上、ローカルサーバーを利用しないと、不具合が生じるからです。しかし、環境によってはローカルサーバーの立ち上げに問題が生じることがあります。
+
+問題が生じた場合は、ご自身でローカルサーバーを別に立てるか、index.htmlを直接chromeで開いてください。
 
 ## 開発者向け情報
 
-テキスト表示部分に関してはPython,音声認識部分に関しては[Web Speech API](https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api/)を、翻訳に関して[Apps Script  \|  Google Developers](https://developers.google.com/apps-script)の翻訳機能を利用しています。テキストを表示させる部分の処理については[KillFrenzy Avatar Text OSC App](https://github.com/killfrenzy96/KatOscApp)の方法を流用しています。また棒読みちゃんとの連携に関しては[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用しています。
+VR Chatへの文字列の送信に関しては[KillFrenzy Avatar Text OSC App](https://github.com/killfrenzy96/KatOscApp)を,音声認識部分に関しては[Web Speech API](https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api/)を、翻訳に関して[Apps Script  \|  Google Developers](https://developers.google.com/apps-script)の翻訳機能を利用しています。また棒読みちゃんとの連携に関しては[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用しています。
 
 
 ## 使用しているライブラリ
@@ -95,4 +119,4 @@ A.アプリを再起動してください。環境によってはローカルサ
 
 ## 寄付
 
-KAT SubtitleはKuretan個人により開発されたソフトウェアです。もしKAT Subtitleを気に入っていただけたら、Boothでの購入や干し芋入りスト、Patronなどbuymeacoffee等を通じて支援がいただけたらありがたいです。勿論TwitterやVR Chat上での感想やコメント・フィードバック、あるいはGithub上でのプルリクエスト等お待ちしています。
+KAT SubtitleはKuretan個人により開発されたソフトウェアです。もしKAT Subtitleを気に入っていただけたら、Boothでのブースト購入等で支援がいただけたらありがたいです。TwitterやVR Chat上での感想やコメント・フィードバックもお待ちしています。

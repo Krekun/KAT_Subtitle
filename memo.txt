@@ -1,3 +1,1 @@
- pyinstaller .\main.py --onefile --name Back_to_the_instance.exe --icon VRC.ico --noconsole --clean
- pyinstaller .\gui.py --onefile --name GUI_Back_to_the_instance.exe --icon VRC.ico --noconsole --clean
-  pyinstaller .\Chromeapi.py --onefile --name KAT_chrome.exe  --noconsole --clean
+pyinstaller .\KAT_Subtitle_Gui.pyw --onefile --name KAT_Subtitle.exe --icon icon.ico --noconsole --clean

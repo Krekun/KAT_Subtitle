@@ -315,6 +315,9 @@
 
     let xhr = new XMLHttpRequest();
     let sock = new WebSocket('ws://127.0.0.1:5001');
+    sock.onerror = function(error) {
+       alert("WebSocketに接続できません。リロードしてください。\nリロード後もこのエラーが出る場合はKAT Subtitleを再起動してください。");
+    };
     let bouyomiChanClient = new BouyomiChanClient();//棒読みちゃん呼び出し
     var is_translate=false;
     var final_transcript = '';
