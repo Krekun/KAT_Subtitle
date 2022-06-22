@@ -70,7 +70,7 @@ Chromeのウインドウの画面の中央部、聞き取る言語の右側に�
 
 https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec?text=
 
-このURLをjsフォルダ下にあるsetting.jsに以下のように記入します。
+取得したURLをjsフォルダ下にあるsetting.jsに以下のように記入します。改行せず一行で記入してください。
 
     const  url_base="https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec?text="
 
