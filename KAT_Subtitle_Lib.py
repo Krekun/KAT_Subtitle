@@ -42,8 +42,7 @@ class KatOscConfig:
 
 
 class KatOsc:
-	def __init__(self,loop=None,config: KatOscConfig = KatOscConfig()):
-		os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+	def __init__(self,loop=None,file=None,config: KatOscConfig = KatOscConfig()):
 		self.osc_ip = config.osc_ip
 		self.osc_port = config.osc_port
 
@@ -75,7 +74,7 @@ class KatOsc:
 		self.target_text = ""
 		#Read convert list
 		try:
-			with open("convertlist.csv","r",encoding="UTF") as f:
+			with open(file,"r",encoding="UTF") as f:
 				reader=csv.reader(f)
 				self.letters_list=[row for row in reader]
 		except:

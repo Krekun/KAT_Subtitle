@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from tkinter import Tk, Text, Button,messagebox
+from tkinter import Tk, Text, Button,messagebox,filedialog
 import math
 import time
 import KAT_Subtitle_Lib
@@ -22,11 +22,19 @@ import KAT_Subtitle_Websocket
 import threading
 import queue
 import os
+import sys
 
 class KAT_Subtitle_Gui:
 	def __init__(self,loop=None,queue_sentence=None,_use_chrome=False):
-		os.chdir(os.path.dirname(os.path.abspath(__file__)))
-		self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop)
+		##Libraryを呼び出し
+		file_path=os.path.dirname(os.path.abspath(sys.argv[0]))
+		title="convertlistを選択"
+		type = [ ('CSVファイル', '*.csv')]
+		root=Tk()
+		root.withdraw()
+		file=filedialog.askopenfilename(title=title,filetypes=type,initialdir=file_path)
+		self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop,file=file)
+		##Websocketの呼び出し
 		self.q_sentence=queue.Queue()
 		Threading_chrome=threading.Thread(target=KAT_Subtitle_Websocket.Websocket,kwargs={"queue":self.q_sentence})
 		Threading_chrome.start()
@@ -35,7 +43,7 @@ class KAT_Subtitle_Gui:
 		self.line_count = self.kat.line_count
 		self.old_sentence=""
 		self.queue=queue# for multi threading
-		self.max_letter_length=32 # max length Japanese:32
+		self.max_letter_length=64 # max length Japanese:32
 		self._use_chrome=_use_chrome
 		self.delay=0.25# 
 		if _use_chrome==True:
