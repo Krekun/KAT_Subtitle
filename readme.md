@@ -26,7 +26,7 @@ KAT_Subtitle.exeと同じ階層のフォルダにCharmap Makerで作成したCon
 ## 主な機能
 
 - 音声を入力
-- 入力内容の相互翻訳
+- 翻訳
 - 外部ソフトを用いた音声合成
 
 ## 使い方
@@ -86,6 +86,11 @@ KAT Subtitleは[棒読みちゃん](https://chi.usamimi.info/Program/Application
 Q.文字化けする・文字が表示されない
 
 A.OSCが有効になっているか・Convertlistが破損していないか・Convertlistが現在使用しているシェーダーの画像に対応しているかを確認してください。
+
+KATを利用するにはOSCを有効にする必要があります。アクションメニューを開き、Setting->OSC->Enabledを選択してください。
+![OSC](images/098fafasdrt4359798909342retf.png)
+詳細に関しては[OSC Overview](https://docs.vrchat.com/docs/osc-overview)をご確認ください。
+
 
 Q.音声認識・翻訳されない
 
