@@ -23,17 +23,25 @@ import threading
 import queue
 import os
 import sys
+import json
+from logging import getLogger, config
 
 class KAT_Subtitle_Gui:
 	def __init__(self,loop=None,queue_sentence=None,_use_chrome=False):
 		##Call Library
 		file_path=os.path.dirname(os.path.abspath(sys.argv[0]))
-		title="convertlistを選択"
+		os.chdir(file_path)
+		with open('log_config.json',"r") as f:
+			log_conf=json.load(f)
+		config.dictConfig(log_conf)
+		logger = getLogger(__name__)
+		logger.info("Start KAT_GUI")
+		title="convertlistを選択" 
 		type = [ ('CSVファイル', '*.csv')]
 		root=Tk()
 		root.withdraw()
 		file=filedialog.askopenfilename(title=title,filetypes=type,initialdir=file_path)
-		self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop,file=file)
+		self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop,file=file,logger=logger)
 		##Call Websocket
 		self.q_sentence=queue.Queue()
 		Threading_chrome=threading.Thread(target=KAT_Subtitle_Websocket.Websocket,kwargs={"queue":self.q_sentence})
