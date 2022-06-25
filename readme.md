@@ -2,7 +2,7 @@
 
 ![image1](images/1.gif)
 
-KAT Subtitleは音声認識を用いて、VR Chatでしゃべった言葉を文字として表示することのできるソフトウェアです。また自動翻訳や外部ソフトを利用することでの音声合成も可能です。
+KAT Subtitleは音声認識を用いて、VR Chatでしゃべった言葉を文字として表示することのできるソフトウェアです。また自動翻訳や外部ソフトを利用することでの音声合成も可能です。NGワード除去機能付きなので、音声認識や翻訳ミスによる誤解を防ぐこともできます。
 
 ## 動作環境
 
@@ -80,6 +80,10 @@ KAT Subtitleは[棒読みちゃん](https://chi.usamimi.info/Program/Application
 棒読みちゃん対応には[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用します。棒読みちゃん本体のプラグインの設定ができたら、bouyomichan_client.jsというファイルをjsフォルダ化に保存します。
 
 このプラグインを導入することで棒読みちゃんに発声させることができます。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。
+
+## NGワード
+
+KAT SubtitleにはNGワード除去機能が備わっています。設定はsettingフォルダ以下のnglist_jp.csvとnglist_en.csvに保存されていますので、お好みに合わせて設定を変えることが可能です。
 
 ## Q&A
 
