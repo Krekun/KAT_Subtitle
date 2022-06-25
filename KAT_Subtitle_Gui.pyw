@@ -26,7 +26,7 @@ import sys
 
 class KAT_Subtitle_Gui:
 	def __init__(self,loop=None,queue_sentence=None,_use_chrome=False):
-		##Libraryを呼び出し
+		##Call Library
 		file_path=os.path.dirname(os.path.abspath(sys.argv[0]))
 		title="convertlistを選択"
 		type = [ ('CSVファイル', '*.csv')]
@@ -34,7 +34,7 @@ class KAT_Subtitle_Gui:
 		root.withdraw()
 		file=filedialog.askopenfilename(title=title,filetypes=type,initialdir=file_path)
 		self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop,file=file)
-		##Websocketの呼び出し
+		##Call Websocket
 		self.q_sentence=queue.Queue()
 		Threading_chrome=threading.Thread(target=KAT_Subtitle_Websocket.Websocket,kwargs={"queue":self.q_sentence})
 		Threading_chrome.start()
