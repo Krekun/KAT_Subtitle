@@ -48,7 +48,7 @@
           Langugage
           <select id="select_language" onchange="updateCountry()"></select>
           <select id="select_dialect"></select>
-          <input type="button" value="Translate" onclick="clickBtn1()" />
+          <input id="translate_button" type="button" value="Translate ON" onclick="clickBtn1()" />
         </div>
         <div id="div_translate">
           <hr>
@@ -260,57 +260,32 @@
       select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
     }
     
-    for (var i = 0; i < langs2.length; i++) {
-    select_language2.options[i] = new Option(langs2[i][0], i);
-        }
-        select_language2.selectedIndex = 43;
-        updateCountry2();
-        select_dialect2.selectedIndex = 0;
-        showInfo('info_start');
-        
-    function updateCountry2() {
-      for (var i = select_dialect2.options.length - 1; i >= 0; i--) {
-        select_dialect2.remove(i);
-      }
-      var list = langs2[select_language2.selectedIndex];
-      for (var i = 1; i < list.length; i++) {
-        select_dialect2.options.add(new Option(list[i][1], list[i][0]));
-      }
-      select_dialect2.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
-    }
 
     for (var i = 0; i < langs2.length; i++) {
-    select_language3.options[i] = new Option(langs2[i][0], i);
+    select_language2.options[i] = new Option(langs2[i][0], langs2[i][1]);
+    select_language3.options[i] = new Option(langs2[i][0], langs2[i][1]);
         }
+        select_language2.selectedIndex = 43;
         select_language3.selectedIndex = 20;
-        updateCountry3();
-        select_dialect3.selectedIndex = 0;
-        showInfo('info_start');
-        
-    function updateCountry3() {
-      for (var i = select_dialect3.options.length - 1; i >= 0; i--) {
-        select_dialect3.remove(i);
-      }
-      var list = langs2[select_language3.selectedIndex];
-      for (var i = 1; i < list.length; i++) {
-        select_dialect3.options.add(new Option(list[i][1], list[i][0]));
-      }
-      select_dialect3.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
-    }
+
 
     document.getElementById("div_translate").style.display ="none";
     function clickBtn1(){
           const div_translate =document.getElementById("div_translate");
+          const translate_button=document.getElementById("translate_button")
 
           if(div_translate .style.display=="block"){
             // noneで非表示
             div_translate .style.display ="none";
             is_translate=false;
+            translate_button.value="Translate ON"
           }else{
             // blockで表示
             div_translate .style.display ="block";
             is_translate=true;
+            translate_button.value="Translate OFF"
           }
+
         }
 
     let xhr = new XMLHttpRequest();
@@ -367,22 +342,6 @@
           start_img.src = 'images/mic.gif';
           showInfo('');
         }
-        // recognizing = false;
-        // if (ignore_onend) {
-        //   return;
-        // }
-
-        // if (!final_transcript) {
-        //   showInfo('info_start');
-        //   return;
-        // }
-
-        // if (window.getSelection) {
-        //   window.getSelection().removeAllRanges();
-        //   var range = document.createRange();
-        //   range.selectNode(document.getElementById('final_span'));
-        //   window.getSelection().addRange(range);
-        // }
         
       }
 
@@ -409,9 +368,8 @@
             alert("翻訳機能の利用には設定が必要です。\nReadmeを確認してください。")
           }
           else{
-          var lang_from=select_dialect2.value;
-          // var lang_to="cmn-Hans-CN"
-          var lang_to=select_dialect3.value;
+          var lang_from=select_language2.value;
+          var lang_to=select_language3.value;
           var url=url_base+final_transcript+"&source="+lang_from+"&target="+lang_to;
           xhr.open('GET', url);
           xhr.send();

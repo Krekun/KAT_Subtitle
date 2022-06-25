@@ -86,11 +86,10 @@ class KatOsc:
 		self.conv_key1={}
 		self.conv_key2={}
 		for i in range(0,len(self.letters_list)):
-		# for i in range(0,3000):
 			self.conv_key1[self.letters_list[i][0]]=i%128
 			self.conv_key2[self.letters_list[i][0]]=int(i/128)
 		self.conv_key1[" "]=0#応急処置　BOMの処理がうまくいかない
-		self.conv_key2[" "]=0#応急処置　BOMの処理がうまくいかない
+		# self.conv_key2[" "]=0#応急処置　BOMの処理がうまくいかない
 		
 		# Character to use in place of unknown characters
 		self.invalid_char_value = self.conv_key1.get(self.invalid_char, 0)

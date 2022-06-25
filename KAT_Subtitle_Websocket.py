@@ -31,7 +31,7 @@ class Websocket():
 
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             url="http://localhost:8002/"
-            webbrowser.open(url)
+            webbrowser.open_new(url)
             httpd.serve_forever()
 
 if __name__=="__main__":
