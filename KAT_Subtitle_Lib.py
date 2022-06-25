@@ -82,140 +82,17 @@ class KatOsc:
 			messagebox.showwarning("エラー", message)
 			os._exit(1)
 		self.invalid_char = "?" # character used to replace invalid characters
-		self.keys = {
-			" " :0,
-			"!":1,
-			"\"":2,
-			"#":3,
-			"$":4,
-			"%":5,
-			"&":6,
-			"'":7,
-			"(":8,
-			")":9,
-			"*":10,
-			"+":11,
-			",":12,
-			"-":13,
-			".":14,
-			"/":15,
-			"0":16,
-			"1":17,
-			"2":18,
-			"3":19,
-			"4":20,
-			"5":21,
-			"6":22,
-			"7":23,
-			"8":24,
-			"9":25,
-			":":26,
-			";":27,
-			"<":28,
-			"=":29,
-			">":30,
-			"?":31,
-			"@":32,
-			"A":33,
-			"B":34,
-			"C":35,
-			"D":36,
-			"E":37,
-			"F":38,
-			"G":39,
-			"H":40,
-			"I":41,
-			"J":42,
-			"K":43,
-			"L":44,
-			"M":45,
-			"N":46,
-			"O":47,
-			"P":48,
-			"Q":49,
-			"R":50,
-			"S":51,
-			"T":52,
-			"U":53,
-			"V":54,
-			"W":55,
-			"X":56,
-			"Y":57,
-			"Z":58,
-			"[":59,
-			"\\":60,
-			"]":61,
-			"^":62,
-			"_":63,
-			"`":64,
-			"a":65,
-			"b":66,
-			"c":67,
-			"d":68,
-			"e":69,
-			"f":70,
-			"g":71,
-			"h":72,
-			"i":73,
-			"j":74,
-			"k":75,
-			"l":76,
-			"m":77,
-			"n":78,
-			"o":79,
-			"p":80,
-			"q":81,
-			"r":82,
-			"s":83,
-			"t":84,
-			"u":85,
-			"v":86,
-			"w":87,
-			"x":88,
-			"y":89,
-			"z":90,
-			"{":91,
-			"|":92,
-			"}":93,
-			"~":94,
-			"€":95,
-			"あ":96,
-			"い":97,
-			"う":98,
-			"え":99,
-			"お":100,
-			"か":101,
-			"き":102,
-			"く":103,
-			"け":104,
-			"こ":105,
-			"さ":106,
-			"し":107,
-			"す":108,
-			"せ":109,
-			"そ":110,
-			"た":111,
-			"ち":112,
-			"つ":113,
-			"て":114,
-			"と":115,
-			"な":116,
-			"に":117,
-			"ぬ":118,
-			"ね":119,
-			"の":120,
-			"は":121,
-			"ひ":122,
-			"ふ":123,
-			"へ":124,
-			"ほ":125,
-			"ま":126,
-			"み":127,
-			"む":128
-		}
-
+		self.conv_key1={}
+		self.conv_key2={}
+		for i in range(0,len(self.letters_list)):
+		# for i in range(0,3000):
+			self.conv_key1[self.letters_list[i][0]]=i%128
+			self.conv_key2[self.letters_list[i][0]]=int(i/128)
+		self.conv_key1[" "]=0#応急処置　BOMの処理がうまくいかない
+		self.conv_key2[" "]=0#応急処置　BOMの処理がうまくいかない
+		
 		# Character to use in place of unknown characters
-		self.invalid_char_value = self.keys.get(self.invalid_char, 0)
+		self.invalid_char_value = self.conv_key1.get(self.invalid_char, 0)
 
 		# --------------
 		# OSC Setup
@@ -257,17 +134,16 @@ class KatOsc:
 
 	#use two one byte letters for one two byte letter
 	#例　亜:5,#　↓:こ,8
-	def convert(self,text_lines):
-		text_lines[1]='                                '
-		text_lines[2]=text_lines[0]
-		for letters in self.letters_list:
-			text_lines=self.replace(text_lines,letters)
-		return text_lines
+	# def convert(self,text_lines):
+	# 	text_lines[2]=text_lines[0]
+	# 	for letters in self.letters_list:
+	# 		text_lines=self.replace(text_lines,letters)
+	# 	return text_lines
 	
-	def replace(self,text_lines,letters):
-		text_lines[0]=text_lines[0].replace(letters[0],letters[1])
-		text_lines[2]=text_lines[2].replace(letters[0],letters[2])
-		return text_lines
+	# def replace(self,text_lines,letters):
+	# 	text_lines[0]=text_lines[0].replace(letters[0],letters[1])
+	# 	text_lines[2]=text_lines[2].replace(letters[0],letters[2])
+	# 	return text_lines
 
 	# Syncronisation loop
 	def osc_timer_loop(self):
@@ -321,14 +197,16 @@ class KatOsc:
 		text_lines = gui_text.split("\n")
 		for index, text in enumerate(text_lines):
 			text_lines[index] = self._pad_line(text)
-		try:
-			text_lines=self.convert(text_lines)                           
-		except:
-			pass
+		# try:
+		# 	text_lines=self.convert(text_lines)                           
+		# except:
+		# 	pass
 		gui_text = self._list_to_string(text_lines)
 
 		# Pad text with spaces up to the text limit
-		gui_text = gui_text.ljust(self.text_length)
+		gui_text = gui_text.ljust(int(self.text_length))
+		gui_text = gui_text[0:64]
+		gui_text += gui_text
 		osc_text = self.osc_text.ljust(self.text_length)
 
 		# Text syncing
@@ -353,7 +231,18 @@ class KatOsc:
 						index = (pointer_index * self.sync_params) + char_index
 						gui_char = gui_text[index]
 						# Convert character to the key value, replace invalid characters
-						key = self.keys.get(gui_char, self.invalid_char_value)
+						#文字の置換
+						#あ,0,1
+						#64文字で処理を切り替え
+						#64までは0,64+iに1
+						# key = self.keys.get(gui_char, self.invalid_char_value)
+						if index < 64:
+							key = self.conv_key1.get(gui_char, self.invalid_char_value)
+							if key==None:
+								key=self.invalid_char_value
+
+						else:
+							key = self.conv_key2.get(gui_char, 0)
 
 						# Calculate character float value for OSC
 						value = float(key)

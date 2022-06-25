@@ -43,7 +43,7 @@ class KAT_Subtitle_Gui:
 		self.line_count = self.kat.line_count
 		self.old_sentence=""
 		self.queue=queue# for multi threading
-		self.max_letter_length=64 # max length Japanese:32
+		self.max_letter_length=64 # max length of a sentence
 		self._use_chrome=_use_chrome
 		self.delay=0.25# 
 		if _use_chrome==True:
@@ -129,7 +129,7 @@ class KAT_Subtitle_Gui:
 				length_padded += self._get_padded_length(text)
 
 		# Delete text if it's too long
-		if length_padded >= self.max_letter_length:
+		if length_padded > self.max_letter_length:
 			self.gui_text.delete("end-" + str(length_padded - 32 + 1) + "c", "end")
 			self.present_sentence=self.gui_text.get(1.0, "end")+"\n"
 			self.set_text("")
