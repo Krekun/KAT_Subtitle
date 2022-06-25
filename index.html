@@ -10,7 +10,7 @@
 -->
 <meta charset="utf-8">
 <script src="js/bouyomichan_client.js"></script>
-<script src="js/setting.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="css/style.css">  
 </head>
 <body>
@@ -48,7 +48,8 @@
           Langugage
           <select id="select_language" onchange="updateCountry()"></select>
           <select id="select_dialect"></select>
-          <input id="translate_button" type="button" value="Translate ON" onclick="clickBtn1()" />
+          <input id="translate_button" type="button" value="Translate ON" onclick="translate_button_click()" />
+          <input id="setting_button" type="button" value="Setting" onclick="setting_button_click()" />
         </div>
         <div id="div_translate">
           <hr>
@@ -58,11 +59,15 @@
           Translate to
           <select id="select_language3" onchange="updateCountry3()"></select>
           <select id="select_dialect3"></select>
-
       <div id="results">
         <span id="translation_span" class="final"></span>
       </div>
       </div>
+      <div id="div_setting">
+        <p>GAS_URL:<input size="200" type="text" id="GAS_URL"></p>
+        DeepL_Api_auth_key:<input  size="200" type="text" id="DeepL_Api_auth_key">
+      </div>
+
   <!-- ////////////////////////////////////////////////////////////////////// -->
  <script>
     var langs =
@@ -269,25 +274,35 @@
         select_language3.selectedIndex = 20;
 
 
-    document.getElementById("div_translate").style.display ="none";
-    function clickBtn1(){
+    $("#div_translate").hide();
+    function translate_button_click(){
           const div_translate =document.getElementById("div_translate");
-          const translate_button=document.getElementById("translate_button")
 
-          if(div_translate .style.display=="block"){
-            // noneで非表示
-            div_translate .style.display ="none";
-            is_translate=false;
-            translate_button.value="Translate ON"
-          }else{
-            // blockで表示
-            div_translate .style.display ="block";
+          if(div_translate .style.display=="none"){
             is_translate=true;
-            translate_button.value="Translate OFF"
+            $('#translate_button').val("Translate OFF");
+          }else{
+            is_translate=false;
+            $('#translate_button').val("Translate ON");
           }
+          $("#div_translate").toggle("fast");
 
         }
 
+    $('#div_setting').hide();
+    function setting_button_click(){
+      $("#div_setting").toggle("fast");
+        }
+
+    var GAS_url_base = window.localStorage.getItem('GAS_URL').replace(/\"/g,"");
+    $('#GAS_URL').val(GAS_url_base);
+    $('#GAS_URL').change(function(){
+      var new_url=$(this).val();
+      GAS_url_base=new_url;
+        console.log(new_url);
+        let jsonData = JSON.stringify(new_url);
+        localStorage.setItem('GAS_URL',jsonData)
+    });
     let xhr = new XMLHttpRequest();
     let sock = new WebSocket('ws://127.0.0.1:5001');
     sock.onerror = function(error) {
@@ -358,19 +373,27 @@
         final_transcript = capitalize(final_transcript);
         final_span.innerHTML = linebreak(final_transcript);
         interim_span.innerHTML = linebreak(interim_transcript);
-        if (final_transcript || interim_transcript) {
-          showButtons('inline-block');
-        }
         if (final_transcript!=""){
           if(is_translate)
         {
-          if(url_base==""){
+          Google_translate(final_transcript);
+      }
+          else{
+            no_translate(final_transcript);
+          }
+
+          }
+        };
+        }
+    
+    function Google_translate(final_transcript){
+      if(GAS_url_base==""){
             alert("翻訳機能の利用には設定が必要です。\nReadmeを確認してください。")
           }
           else{
           var lang_from=select_language2.value;
           var lang_to=select_language3.value;
-          var url=url_base+final_transcript+"&source="+lang_from+"&target="+lang_to;
+          var url=GAS_url_base+final_transcript+"&source="+lang_from+"&target="+lang_to;
           xhr.open('GET', url);
           xhr.send();
           xhr.onload=function(){
@@ -386,16 +409,38 @@
               sock.send(send_text);//KAT に文章を送る
               bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
           }
-        }}}
-          else{
-              var send_text=final_transcript;
+        }}
+
+    } 
+    
+    function DeepL_translate(final_transcript){
+          var lang_from=select_language2.value;
+          var lang_to=select_language3.value;
+          var url=GAS_url_base+final_transcript+"&source="+lang_from+"&target="+lang_to;
+          xhr.open('GET', url);
+          xhr.send();
+          xhr.onload=function(){
+              if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
+              alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+            } 
+            else { 
+              console.log(url);
+              translation_span.innerHTML =xhr.response;
+              console.log('socket open');
+              var send_text=xhr.response;
+              console.log(send_text);
               sock.send(send_text);//KAT に文章を送る
               bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
           }
-
-          }
-        };
         }
+
+    }
+
+    function no_translate(final_transcript){
+      var send_text=final_transcript;
+      sock.send(send_text);//KAT に文章を送る
+      bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
+    }
     
     function upgrade() {
       start_button.style.visibility = 'hidden';
