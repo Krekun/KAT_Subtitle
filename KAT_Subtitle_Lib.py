@@ -16,11 +16,8 @@
 
 from threading import Timer
 from pythonosc import udp_client, osc_server, dispatcher
-import math, asyncio, threading
-import csv
-import os
+import math, asyncio, threading,sys,os,csv
 from tkinter import messagebox
-
 
 class KatOscConfig:
 	def __init__(self):
@@ -40,6 +37,8 @@ class KatOscConfig:
 
 class KatOsc:
 	def __init__(self,loop=None,file=None,logger=None,config: KatOscConfig = KatOscConfig()):
+		file_path=os.path.dirname(os.path.abspath(sys.argv[0]))
+		os.chdir(file_path)
 		self.logger=logger
 		self.logger.info("StartKatOSC")
 		self.osc_ip = config.osc_ip
@@ -131,7 +130,36 @@ class KatOsc:
 
 	# Set the text to any value
 	def set_text(self, text: str):
+		text=self.remove_offensive_word(text)
 		self.target_text = text
+
+	# Avoid Recognition/translation problem
+	def remove_offensive_word(self, text:str):
+		#nglist_en is retrived from https://www.freewebheaders.com/full-list-of-bad-words-banned-by-google/
+		#nglist_jp is retrieved from https://dic.nicovideo.jp/a/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E7%94%9F%E6%94%BE%E9%80%81%3A%E9%81%8B%E5%96%B6ng%E3%83%AF%E3%83%BC%E3%83%89%E4%B8%80%E8%A6%A7
+		with open("setting/nglist_en.csv","r",encoding="UTF") as f:
+			nglist_en=csv.reader(f,delimiter=",")
+			for row in nglist_en:
+				text=self.remove_from_list_en(row,text)
+		with open("setting/nglist_jp.csv","r",encoding="UTF") as f:
+			nglist_jp=csv.reader(f,delimiter=",")
+			for row in nglist_jp:
+					text=self.remove_from_list_jp(row,text)
+		return text
+
+	
+	def remove_from_list_en(self,list,text):
+		for ng in list:
+			ng_title=ng.title()
+			text=text.replace(ng,ng[0]+"x"*(len(ng)-1))
+			text=text.replace(ng_title,ng_title[0]+"x"*(len(ng)-1))
+		return text
+	def remove_from_list_jp(self,list,text):
+		for ng in list:
+			text=text.replace(ng,"x"*(len(ng)))
+		return text
+
+
 
 	# Syncronisation loop
 	def osc_timer_loop(self):

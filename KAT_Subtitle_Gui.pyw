@@ -97,6 +97,7 @@ class KAT_Subtitle_Gui:
 
 	def close_window(self):
 		if messagebox.askokcancel("確認", "本当に閉じていいですか？"):
+			self.set_text("")
 			os._exit(0)
 
 	#For Chrome  web speech API
