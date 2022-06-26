@@ -498,6 +498,15 @@
       }
       current_style = style;
     }
+
+    $('#select_language').change(function(){
+      recognition.lang = select_dialect.value;
+      recognition.stop();
+    });
+    $('#select_dialect').change(function(){
+      recognition.lang = select_dialect.value;
+      recognition.stop();
+    });
     </script> 
 </body>
 </html>
