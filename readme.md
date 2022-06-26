@@ -70,9 +70,8 @@ Chromeのウインドウの画面の中央部、聞き取る言語の右側に�
 
 https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec?text=
 
-取得したURLをjsフォルダ下にあるsetting.jsに以下のように記入します。改行せず一行で記入してください。
-
-    const  url_base="https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec?text="
+このURLをsettingのGASの欄に貼り付けてください。
+![](images/4.gif)
 
 ### 音声合成
 

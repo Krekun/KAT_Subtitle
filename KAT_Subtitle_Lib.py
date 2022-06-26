@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from asyncio.log import logger
 from threading import Timer
 from pythonosc import udp_client, osc_server, dispatcher
 import math, asyncio, threading,sys,os,csv
@@ -56,6 +57,7 @@ class KatOsc:
 
 		self.text_length =128 # Maximum length of text
 		self.sync_params_max = 35 # Maximum sync parameters
+		self.old_sentence=""
 
 		self.pointer_count = int(self.text_length / self.sync_params)
 		self.pointer_clear = 255
@@ -75,7 +77,7 @@ class KatOsc:
 			with open(file,"r",encoding="UTF") as f:
 				reader=csv.reader(f)
 				self.letters_list=[row for row in reader]
-			self.logger.info("Convertlist was loaded correctly")
+			self.logger.info("Convertlist {} was loaded successfully".format(file))
 		except:
 			message="Convertlistが見当たりません。"
 			self.logger.critical(message)
@@ -264,7 +266,12 @@ class KatOsc:
 						osc_chars[index] = gui_char # Apply changes to the networked value
 
 					self.osc_text = self._list_to_string(osc_chars)
+					if self.old_sentence!=gui_text:
+						self.logger.info("Sent {}".format(gui_text[0:int(self.text_length/2)].rstrip()))
+						self.old_sentence=gui_text
 					return
+
+
 
 
 	# Starts the OSC server
