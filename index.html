@@ -293,8 +293,11 @@
     function setting_button_click(){
       $("#div_setting").toggle("fast");
         }
-
-    var GAS_url_base = window.localStorage.getItem('GAS_URL').replace(/\"/g,"");
+    try{
+      var GAS_url_base = window.localStorage.getItem('GAS_URL').replace(/\"/g,"");
+    }catch(e){
+      var GAS_url_base =""
+    }
     $('#GAS_URL').val(GAS_url_base);
     $('#GAS_URL').change(function(){
       var new_url=$(this).val();
