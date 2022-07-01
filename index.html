@@ -396,7 +396,7 @@
           else{
           var lang_from=select_language2.value;
           var lang_to=select_language3.value;
-          var url=GAS_url_base+final_transcript+"&source="+lang_from+"&target="+lang_to;
+          var url=GAS_url_base+"?text="+final_transcript+"&source="+lang_from+"&target="+lang_to;
           xhr.open('GET', url);
           xhr.send();
           xhr.onload=function(){

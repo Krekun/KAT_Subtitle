@@ -68,7 +68,7 @@ Chromeのウインドウの画面の中央部、聞き取る言語の右側に�
 
 この記事に従うと下記のようなURLが取得できます。(このURLは実際には機能しません。)
 
-https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec?text=
+https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec
 
 このURLをsettingのGASの欄に貼り付けてください。
 ![](images/4.gif)
