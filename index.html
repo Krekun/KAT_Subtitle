@@ -281,6 +281,7 @@
           if(div_translate .style.display=="none"){
             is_translate=true;
             $('#translate_button').val("Translate OFF");
+            test_translate()
           }else{
             is_translate=false;
             $('#translate_button').val("Translate ON");
@@ -293,6 +294,7 @@
     function setting_button_click(){
       $("#div_setting").toggle("fast");
         }
+  let xhr = new XMLHttpRequest();
     try{
       var GAS_url_base = window.localStorage.getItem('GAS_URL').replace(/\"/g,"");
     }catch(e){
@@ -304,9 +306,10 @@
       GAS_url_base=new_url;
         console.log(new_url);
         let jsonData = JSON.stringify(new_url);
-        localStorage.setItem('GAS_URL',jsonData)
+        localStorage.setItem('GAS_URL',jsonData);
+        test_translate();
     });
-    let xhr = new XMLHttpRequest();
+
     let sock = new WebSocket('ws://127.0.0.1:5001');
     sock.onerror = function(error) {
        alert("WebSocketに接続できません。リロードしてください。\nリロード後もこのエラーが出る場合はKAT Subtitleを再起動してください。");
@@ -397,9 +400,13 @@
           var lang_from=select_language2.value;
           var lang_to=select_language3.value;
           var url=GAS_url_base+"?text="+final_transcript+"&source="+lang_from+"&target="+lang_to;
-          xhr.open('GET', url);
-          xhr.send();
-          xhr.onload=function(){
+            xhr.open('GET', url);
+            xhr.send();
+            console.log("Xhrsent")
+            xhr.onerror=function(){
+              alert("翻訳に問題が発生しました。")
+            }
+            xhr.onload=function(){
               if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
               alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
             } 
@@ -411,10 +418,8 @@
               console.log(send_text);
               sock.send(send_text);//KAT に文章を送る
               bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
-          }
-        }}
-
-    } 
+          }}}
+        }
     
     function DeepL_translate(final_transcript){
           var lang_from=select_language2.value;
@@ -445,6 +450,30 @@
       bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
     }
     
+    function test_translate(){
+          var url=GAS_url_base+"?text="+"テスト"+"&source=ja&target=en";
+          xhr.open('GET', url);
+          xhr.send();
+          xhr.onerror=function(){
+              alert("翻訳に問題が発生しました。");
+            }
+          xhr.onload=function(){
+              if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
+              alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+            } 
+            else { 
+              console.log(url);
+              if(xhr.response!="test"){
+                alert("翻訳がうまくいっていません。URLを見直してください。")
+              }
+              else{
+                console.log("Translation test worked successfully")
+              }
+
+          }
+        }}
+    
+
     function upgrade() {
       start_button.style.visibility = 'hidden';
       showInfo('info_upgrade');
