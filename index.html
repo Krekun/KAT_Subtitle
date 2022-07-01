@@ -46,7 +46,7 @@
         <p>
         <div id="div_language">
           Langugage
-          <select id="select_language" onchange="updateCountry()"></select>
+          <select id="select_language" onchange="UpdateCountry()"></select>
           <select id="select_dialect"></select>
           <input id="translate_button" type="button" value="Translate ON" onclick="translate_button_click()" />
           <input id="setting_button" type="button" value="Setting" onclick="setting_button_click()" />
@@ -54,11 +54,9 @@
         <div id="div_translate">
           <hr>
           Translate from
-          <select id="select_language2" onchange="updateCountry2()"></select>
-          <select id="select_dialect2"></select>
+          <select id="select_lang_from" ></select>
           Translate to
-          <select id="select_language3" onchange="updateCountry3()"></select>
-          <select id="select_dialect3"></select>
+          <select id="select_lang_to" ></select>
       <div id="results">
         <span id="translation_span" class="final"></span>
       </div>
@@ -74,7 +72,7 @@
 
   <!-- ////////////////////////////////////////////////////////////////////// -->
  <script>
-    var langs =
+    var langs_recognition =
     [['Afrikaans',       ['af-ZA']],
      ['Bahasa Indonesia',['id-ID']],
      ['Bahasa Melayu',   ['ms-MY']],
@@ -138,7 +136,7 @@
      ['日本語',           ['ja-JP']],
      ['Lingua latīna',   ['la']]];
 
-     var langs2 =
+     var langs_translate =
      [['Afrikaans',       ['af']],
       ['Albanian',       ['sq']],
       ['Amharic',       ['am']],
@@ -250,20 +248,20 @@
       ['Zulu',       ['zu']]
     ];
     
-    for (var i = 0; i < langs.length; i++) {
-      select_language.options[i] = new Option(langs[i][0], i);
+    for (var i = 0; i < langs_recognition.length; i++) {
+      select_language.options[i] = new Option(langs_recognition[i][0], i);
     }
     select_language.selectedIndex = 30;
-    updateCountry();
+    UpdateCountry();
     select_dialect.selectedIndex = 6;
-    showInfo('info_start');
+    ShowInfo('info_start');
     
-    for (var i = 0; i < langs2.length; i++) {
-    select_language2.options[i] = new Option(langs2[i][0], langs2[i][1]);
-    select_language3.options[i] = new Option(langs2[i][0], langs2[i][1]);
+    for (var i = 0; i < langs_translate.length; i++) {
+    select_lang_from.options[i] = new Option(langs_translate[i][0], langs_translate[i][1]);
+    select_lang_to.options[i] = new Option(langs_translate[i][0], langs_translate[i][1]);
         }
-        select_language2.selectedIndex = 43;
-        select_language3.selectedIndex = 20;
+        select_lang_from.selectedIndex = 43;
+        select_lang_to.selectedIndex = 20;
 
   let xhr = new XMLHttpRequest();
     try{
@@ -271,9 +269,9 @@
     }catch(e){
       var GAS_url_base =""
     }
-    if (GAS_url_base!=""){
-      test_translate();
-    }
+    // if (GAS_url_base!=""){
+    //   test_translate();
+    // }
     $('#GAS_URL').val(GAS_url_base);
     $('#GAS_URL').change(function(){
       var new_url=$(this).val();
@@ -305,26 +303,26 @@
       recognition.interimResults = true;
     
       recognition.onstart = function() {
-        showInfo('info_speak_now');
+        ShowInfo('info_speak_now');
         start_img.src = 'images/mic-animate.gif';
       };
     
       recognition.onerror = function(event) {
         if (event.error == 'no-speech') {
           start_img.src = 'images/mic.gif';
-          showInfo('info_no_speech');
+          ShowInfo('info_no_speech');
           ignore_onend = true;
         }
         if (event.error == 'audio-capture') {
           start_img.src = 'images/mic.gif';
-          showInfo('info_no_microphone');
+          ShowInfo('info_no_microphone');
           ignore_onend = true;
         }
         if (event.error == 'not-allowed') {
           if (event.timeStamp - start_timestamp < 100) {
-            showInfo('info_blocked');
+            ShowInfo('info_blocked');
           } else {
-            showInfo('info_denied');
+            ShowInfo('info_denied');
           }
           ignore_onend = true;
         }
@@ -337,7 +335,7 @@
         }
         else{
           start_img.src = 'images/mic.gif';
-          showInfo('');
+          ShowInfo('');
         }
         
       }
@@ -368,11 +366,11 @@
         };
         }
     
-      function updateCountry() {
+      function UpdateCountry() {
       for (var i = select_dialect.options.length - 1; i >= 0; i--) {
         select_dialect.remove(i);
       }
-      var list = langs[select_language.selectedIndex];
+      var list = langs_recognition[select_language.selectedIndex];
       for (var i = 1; i < list.length; i++) {
         select_dialect.options.add(new Option(list[i][1], list[i][0]));
       }
@@ -381,8 +379,8 @@
     
 
     function Google_translate(final_transcript){
-          var lang_from=select_language2.value;
-          var lang_to=select_language3.value;
+          var lang_from=select_lang_from.value;
+          var lang_to=select_lang_to.value;
           var url=GAS_url_base+"?text="+final_transcript+"&source="+lang_from+"&target="+lang_to;
             xhr.open('GET', url);
             xhr.send();
@@ -444,7 +442,7 @@
 
     function upgrade() {
       start_button.style.visibility = 'hidden';
-      showInfo('info_upgrade');
+      ShowInfo('info_upgrade');
     }
     
     var two_line = /\n\n/g;
@@ -473,12 +471,12 @@
       final_span.innerHTML = '';
       interim_span.innerHTML = '';
       start_img.src = 'images/mic-slash.gif';
-      showInfo('info_allow');
-      showButtons('none');
+      ShowInfo('info_allow');
+      ShowButtons('none');
       start_timestamp = event.timeStamp;
     }
     
-    function showInfo(s) {
+    function ShowInfo(s) {
       if (s) {
         for (var child = info.firstChild; child; child = child.nextSibling) {
           if (child.style) {
@@ -492,7 +490,7 @@
     }
     
     var current_style;
-    function showButtons(style) {
+    function ShowButtons(style) {
       if (style == current_style) {
         return;
       }
