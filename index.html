@@ -65,6 +65,10 @@
       </div>
       <div id="div_setting">
         <p>GAS_URL:<input size="200" type="text" id="GAS_URL"></p>
+        <p>VR Chat上に表示する<input type="checkbox" title="Subtitle" id="Subtitle_whether" checked>
+        音声出力する<input type="checkbox" title="Makevoice" id="Makevoice_whether" checked>
+        </p>
+
         <!-- DeepL_Api_auth_key:<input  size="200" type="text" id="DeepL_Api_auth_key"> -->
       </div>
 
@@ -254,18 +258,6 @@
     select_dialect.selectedIndex = 6;
     showInfo('info_start');
     
-    function updateCountry() {
-      for (var i = select_dialect.options.length - 1; i >= 0; i--) {
-        select_dialect.remove(i);
-      }
-      var list = langs[select_language.selectedIndex];
-      for (var i = 1; i < list.length; i++) {
-        select_dialect.options.add(new Option(list[i][1], list[i][0]));
-      }
-      select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
-    }
-    
-
     for (var i = 0; i < langs2.length; i++) {
     select_language2.options[i] = new Option(langs2[i][0], langs2[i][1]);
     select_language3.options[i] = new Option(langs2[i][0], langs2[i][1]);
@@ -273,32 +265,14 @@
         select_language2.selectedIndex = 43;
         select_language3.selectedIndex = 20;
 
-
-    $("#div_translate").hide();
-    function translate_button_click(){
-          const div_translate =document.getElementById("div_translate");
-
-          if(div_translate .style.display=="none"){
-            is_translate=true;
-            $('#translate_button').val("Translate OFF");
-            test_translate()
-          }else{
-            is_translate=false;
-            $('#translate_button').val("Translate ON");
-          }
-          $("#div_translate").toggle("fast");
-
-        }
-
-    $('#div_setting').hide();
-    function setting_button_click(){
-      $("#div_setting").toggle("fast");
-        }
   let xhr = new XMLHttpRequest();
     try{
       var GAS_url_base = window.localStorage.getItem('GAS_URL').replace(/\"/g,"");
     }catch(e){
       var GAS_url_base =""
+    }
+    if (GAS_url_base!=""){
+      test_translate();
     }
     $('#GAS_URL').val(GAS_url_base);
     $('#GAS_URL').change(function(){
@@ -316,6 +290,8 @@
     };
     let bouyomiChanClient = new BouyomiChanClient();//棒読みちゃん呼び出し
     var is_translate=false;
+    var is_subtitle=true;
+    var is_Makevoice=true;
     var final_transcript = '';
     var recognizing = false;
     var ignore_onend;
@@ -385,18 +361,26 @@
           Google_translate(final_transcript);
       }
           else{
-            no_translate(final_transcript);
+            Send_texts(final_transcript);
           }
 
           }
         };
         }
     
+      function updateCountry() {
+      for (var i = select_dialect.options.length - 1; i >= 0; i--) {
+        select_dialect.remove(i);
+      }
+      var list = langs[select_language.selectedIndex];
+      for (var i = 1; i < list.length; i++) {
+        select_dialect.options.add(new Option(list[i][1], list[i][0]));
+      }
+      select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+    }
+    
+
     function Google_translate(final_transcript){
-      if(GAS_url_base==""){
-            alert("翻訳機能の利用には設定が必要です。\nReadmeを確認してください。")
-          }
-          else{
           var lang_from=select_language2.value;
           var lang_to=select_language3.value;
           var url=GAS_url_base+"?text="+final_transcript+"&source="+lang_from+"&target="+lang_to;
@@ -413,49 +397,33 @@
             else { 
               console.log(url);
               translation_span.innerHTML =xhr.response;
-              console.log('socket open');
               var send_text=xhr.response;
               console.log(send_text);
-              sock.send(send_text);//KAT に文章を送る
-              bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
+              Send_texts(send_text);
           }}}
-        }
+        
     
-    function DeepL_translate(final_transcript){
-          var lang_from=select_language2.value;
-          var lang_to=select_language3.value;
-          var url=GAS_url_base+final_transcript+"&source="+lang_from+"&target="+lang_to;
-          xhr.open('GET', url);
-          xhr.send();
-          xhr.onload=function(){
-              if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
-              alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
-            } 
-            else { 
-              console.log(url);
-              translation_span.innerHTML =xhr.response;
-              console.log('socket open');
-              var send_text=xhr.response;
-              console.log(send_text);
-              sock.send(send_text);//KAT に文章を送る
-              bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
-          }
-        }
 
-    }
-
-    function no_translate(final_transcript){
+    function Send_texts(final_transcript){
       var send_text=final_transcript;
+      if (is_subtitle){
       sock.send(send_text);//KAT に文章を送る
+      }
+      if (is_Makevoice){
       bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
     }
+  }
     
     function test_translate(){
+          if(GAS_url_base==""){
+                alert("翻訳機能の利用には設定が必要です。\nReadmeを確認してください。")
+              }
+          else{
           var url=GAS_url_base+"?text="+"テスト"+"&source=ja&target=en";
           xhr.open('GET', url);
           xhr.send();
           xhr.onerror=function(){
-              alert("翻訳に問題が発生しました。");
+              alert("翻訳のテストに失敗しました。URLが正しいか確認してください。");
             }
           xhr.onload=function(){
               if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
@@ -464,13 +432,13 @@
             else { 
               console.log(url);
               if(xhr.response!="test"){
-                alert("翻訳がうまくいっていません。URLを見直してください。")
+                alert("翻訳に問題が発生しました。URLが正しいか確認してください。")
               }
               else{
                 console.log("Translation test worked successfully")
               }
 
-          }
+          }}
         }}
     
 
@@ -538,6 +506,51 @@
     $('#select_dialect').change(function(){
       recognition.lang = select_dialect.value;
       recognition.stop();
+    });
+    $("#div_translate").hide();
+    function translate_button_click(){
+          const div_translate =document.getElementById("div_translate");
+
+          if(div_translate .style.display=="none"){
+            is_translate=true;
+            $('#translate_button').val("Translate OFF");
+            test_translate();
+          }else{
+            is_translate=false;
+            $('#translate_button').val("Translate ON");
+          }
+          $("#div_translate").toggle("fast");
+
+        }
+
+    $('#div_setting').hide();
+    function setting_button_click(){
+      $("#div_setting").toggle("fast");
+        }
+
+    $('#Subtitle_whether').change(function(){
+      var bool=$(this).prop('checked');
+      if (bool){
+        is_subtitle=true;
+        console.log("Subtitle enabled")
+      }
+      else{
+        is_subtitle=false;
+        console.log("Subtitle unabled")
+      }
+    });
+
+      $('#Makevoice_whether').change(function(){
+      var bool=$(this).prop('checked');
+      if (bool){
+        is_Makevoice=true;
+        console.log("MakeVoice enabled");
+      }
+      else{
+        is_Makevoice=false;
+        console.log("MakedVoice unabled");
+      }
+
     });
     </script> 
 </body>
