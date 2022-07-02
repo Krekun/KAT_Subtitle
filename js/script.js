@@ -209,7 +209,7 @@ let sock = new WebSocket('ws://127.0.0.1:5001');
 sock.onerror = function (error) {
   alert("WebSocketに接続できません。リロードしてください。\nリロード後もこのエラーが出る場合はKAT Subtitleを再起動してください。");
 };
-let bouyomiChanClient = new BouyomiChanClient();//棒読みちゃん呼び出し
+let bouyomiChanClient = new BouyomiChanClient();
 var is_translate = false;
 var is_subtitle = true;
 var is_Makevoice = true;
@@ -276,12 +276,19 @@ if (!('webkitSpeechRecognition' in window)) {
     final_transcript = capitalize(final_transcript);
     final_span.innerHTML = linebreak(final_transcript);
     interim_span.innerHTML = linebreak(interim_transcript);
-    if (final_transcript != "") {
+    //Make setting menu to configure refresh ratio
+    if (final_transcript == "") {
+      if (Math.random() > 0.01) {
+        Send_texts(interim_transcript);
+      }
+    }
+    else {
       if (is_translate) {
         Google_translate(final_transcript);
       }
       else {
         Send_texts(final_transcript);
+        //pass
       }
 
     }
@@ -361,6 +368,7 @@ function Google_translate(final_transcript) {
   var lang_from = select_lang_from.value;
   var lang_to = select_lang_to.value;
   var url = GAS_url_base + "?text=" + final_transcript + "&source=" + lang_from + "&target=" + lang_to;
+  //Need to refactor xhr
   xhr.open('GET', url);
   xhr.send();
   console.log("Xhrsent")
@@ -386,10 +394,10 @@ function Google_translate(final_transcript) {
 function Send_texts(final_transcript) {
   var send_text = final_transcript;
   if (is_subtitle) {
-    sock.send(send_text);//KAT に文章を送る
+    sock.send(send_text);//Send a text to KAT
   }
   if (is_Makevoice) {
-    bouyomiChanClient.talk(send_text);//棒読みちゃんに文章を送る
+    bouyomiChanClient.talk(send_text);//Send a text to Bouyomichan
   }
 }
 
@@ -405,7 +413,7 @@ function test_translate() {
       alert("翻訳のテストに失敗しました。URLが正しいか確認してください。");
     }
     xhr.onload = function () {
-      if (xhr.status != 200) { // レスポンスの HTTP ステータスを解析
+      if (xhr.status != 200) { //  analysize HTTP statas
         alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
       }
       else {
@@ -478,4 +486,4 @@ function ShowButtons(style) {
     return;
   }
   current_style = style;
-}
+};
