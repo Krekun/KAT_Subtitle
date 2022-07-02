@@ -217,6 +217,7 @@ var final_transcript = '';
 var recognizing = false;
 var ignore_onend;
 var start_timestamp;
+var current_style;
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
 } else {
@@ -286,6 +287,63 @@ if (!('webkitSpeechRecognition' in window)) {
     }
   };
 }
+
+
+$('#select_language').change(function () {
+  recognition.lang = select_dialect.value;
+  recognition.stop();
+});
+$('#select_dialect').change(function () {
+  recognition.lang = select_dialect.value;
+  recognition.stop();
+});
+
+$("#div_translate").hide();
+function translate_button_click() {
+  const div_translate = document.getElementById("div_translate");
+
+  if (div_translate.style.display == "none") {
+    is_translate = true;
+    $('#translate_button').val("Translate OFF");
+    // test_translate();
+  } else {
+    is_translate = false;
+    $('#translate_button').val("Translate ON");
+  }
+  $("#div_translate").toggle("fast");
+
+}
+
+$('#div_setting').hide();
+function setting_button_click() {
+  $("#div_setting").toggle("fast");
+}
+
+$('#Subtitle_whether').change(function () {
+  var bool = $(this).prop('checked');
+  if (bool) {
+    is_subtitle = true;
+    console.log("Subtitle enabled")
+  }
+  else {
+    is_subtitle = false;
+    console.log("Subtitle unabled")
+  }
+});
+
+$('#Makevoice_whether').change(function () {
+  var bool = $(this).prop('checked');
+  if (bool) {
+    is_Makevoice = true;
+    console.log("MakeVoice enabled");
+  }
+  else {
+    is_Makevoice = false;
+    console.log("MakedVoice unabled");
+  }
+
+});
+
 
 function UpdateCountry() {
   for (var i = select_dialect.options.length - 1; i >= 0; i--) {
@@ -370,14 +428,14 @@ function upgrade() {
   ShowInfo('info_upgrade');
 }
 
-var two_line = /\n\n/g;
-var one_line = /\n/g;
 function linebreak(s) {
+  var two_line = /\n\n/g;
+  var one_line = /\n/g;
   return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
 }
 
-var first_char = /\S/;
 function capitalize(s) {
+  var first_char = /\S/;
   return s.replace(first_char, function (m) { return m.toUpperCase(); });
 }
 
@@ -414,65 +472,10 @@ function ShowInfo(s) {
   }
 }
 
-var current_style;
+
 function ShowButtons(style) {
   if (style == current_style) {
     return;
   }
   current_style = style;
 }
-
-$('#select_language').change(function () {
-  recognition.lang = select_dialect.value;
-  recognition.stop();
-});
-$('#select_dialect').change(function () {
-  recognition.lang = select_dialect.value;
-  recognition.stop();
-});
-
-$("#div_translate").hide();
-function translate_button_click() {
-  const div_translate = document.getElementById("div_translate");
-
-  if (div_translate.style.display == "none") {
-    is_translate = true;
-    $('#translate_button').val("Translate OFF");
-    // test_translate();
-  } else {
-    is_translate = false;
-    $('#translate_button').val("Translate ON");
-  }
-  $("#div_translate").toggle("fast");
-
-}
-
-$('#div_setting').hide();
-function setting_button_click() {
-  $("#div_setting").toggle("fast");
-}
-
-$('#Subtitle_whether').change(function () {
-  var bool = $(this).prop('checked');
-  if (bool) {
-    is_subtitle = true;
-    console.log("Subtitle enabled")
-  }
-  else {
-    is_subtitle = false;
-    console.log("Subtitle unabled")
-  }
-});
-
-$('#Makevoice_whether').change(function () {
-  var bool = $(this).prop('checked');
-  if (bool) {
-    is_Makevoice = true;
-    console.log("MakeVoice enabled");
-  }
-  else {
-    is_Makevoice = false;
-    console.log("MakedVoice unabled");
-  }
-
-});
