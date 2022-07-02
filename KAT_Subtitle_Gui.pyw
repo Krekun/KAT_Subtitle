@@ -123,7 +123,7 @@ class KAT_Subtitle_Gui:
         self.gui_text.focus_set()
 
     # Limits the text length of the text box
-    def _limit_text_length(self):
+    def _limit_text_length(self, *args):
         # Prevent too many line feeds
         self.gui_text.delete(2.0, "end")
 

@@ -24,7 +24,7 @@ class Websocket:
         # print ("WebSocket 起動")
         pass
 
-    def message_received(self, message):
+    def message_received(self, client, server, message):
         self.q_sentence.put(message)
 
     def server(self):
