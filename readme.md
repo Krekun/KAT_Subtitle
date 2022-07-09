@@ -18,10 +18,6 @@ KAT Subtitleは音声認識を用いて、VR Chatでしゃべった言葉を文�
 
 KAT_Subtitle.exeを起動
 
-### Charmapmakerを利用する場合
-
-KAT_Subtitle.exeと同じ階層のフォルダにCharmap Makerで作成したConvertlistを導入してください。
-元々入っているConvertlistはサンプルアバター専用ですので、不要です。
 
 ## 主な機能
 
@@ -33,7 +29,10 @@ KAT_Subtitle.exeと同じ階層のフォルダにCharmap Makerで作成したCon
 
 ### 音声入力
 
-KAT_Subtitle.exeを起動すると、Chromeのウインドウ[KAT Subtitle \| KAT Subtitle](https://kat-subtitle.netlify.app/)とエディタが起動します。
+KAT_Subtitle.exeを起動すると、convertlistの選択画面が起動します。[Kuretan Avatar Text](https://kuretan.booth.pm/items/3962022)の無償版を利用している方は、ラノベPOP v2__21lines_converter.csvを、漢字対応版を利用されている方はラノベPOP v2__77lines_converter.csv　を選択してください。
+Charmapmakerで作成したconvertlistを利用する場合は、ご自身で作成されたconvertlistを選択してください。
+
+ファイル選択後、Chromeのウインドウ[KAT Subtitle \| KAT Subtitle](https://kat-subtitle.netlify.app/)とエディタが起動します。
 
 ![image1](images/1.gif)
 
@@ -41,15 +40,14 @@ KAT_Subtitle.exeを起動すると、Chromeのウインドウ[KAT Subtitle \| KA
 
 ChromeのウインドウはWeb Speech APIを用いた音声認識およびGoogle translateによる翻訳に使用します。マイクのアイコンを押すと音声認識が開始されます。
 
-認識された音声は画面の中央部に表示された後、二つ目のウインドウに送られてから、VR Chatに送られます。使用上32文字以上の文章は表示できないため、長文でしゃべることはできません。
+認識された音声は画面の中央部に表示された後、二つ目のウインドウに送られてから、VR Chatに送られます。使用上64文字以上の文章は表示できないため、長文でしゃべることはできません。
 
 ### 手動入力
 
 KAT Subtitleはタイピングによる入力にも採用しています。エディタ上に、直接文字を入力してください。文章の最後が「。」または「？」で終了した場合、エディタ上の文章はリセットされます。右側のClearボタンを押しても、テキストを消すことができます。
 
-Windows11をご利用の方は、windows11の標準音声入力をすることも可能です。文字入力欄を選択中にWindows+Hを押すと、音声入力が開始されます。音声入力の設定から句読点の自動挿入をオンにすると、文章が終わると自動的に入力内容がクリアされます。これにより一々文章を削除することなく、スムーズにしゃべり続けることができます。
+Windows11をご利用の方は、windows11の標準音声入力をすることも可能です。文字入力欄を選択中にWindows+Hを押すと、音声入力が開始されます。音声入力の設定から句読点の自動挿入をオンにすると、文章が終わると自動的に入力内容がクリアされます。これにより一々文章を削除することなく、スムーズにしゃべり続けることができます。Web Speech APIとWindows11標準の音声入力の精度は大差ありませんので、お好みのほうをご利用ください
 
-Web Speech APIとWindows11標準の音声入力の精度は大差ありませんので、お好みのほうをご利用ください。またいずれの音声入力も外部での音声認識を行っているため、部外者に内容が伝わる可能性があることをご留意ください。
 
 ### 翻訳（要設定）
 
@@ -85,6 +83,11 @@ KAT Subtitleは[棒読みちゃん](https://chi.usamimi.info/Program/Application
 
 KAT SubtitleにはNGワード除去機能が備わっています。設定はsettingフォルダ以下のnglist_jp.csvとnglist_en.csvに保存されていますので、お好みに合わせて設定を変えることが可能です。
 
+## プライバシー面に関して
+
+音声入力あるいは翻訳した内容は、外部サーバーで処理を行っている関係上、部外者に内容が伝わるリスクがあることをご留意ください。特にWeb speech apiに関しては、個人情報の扱いに関する規定がはっきりしていません。
+KAT Subtitle利用時はくれぐれも機密情報や個人情報を入力しないでください。
+
 ## Q&A
 
 Q.文字化けする・文字が表示されない
@@ -112,7 +115,7 @@ VR Chatへの文字列の送信に関しては[KillFrenzy Avatar Text OSC App](h
 
 ## ライセンス
 
-本ソフトウェアはGNU General Public Licenseで配布しています。
+本ソフトウェアはGNU General Public Licenseで配布しています。本ソフトウェアを利用すことによって生じたいかなる損害に対しても私は責任を持ちません。すべて自己責任でよろしくお願いします。
 
 ## なぜこのソフトを作成したか
 
