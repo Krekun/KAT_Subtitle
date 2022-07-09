@@ -32,7 +32,7 @@ class Websocket:
         Handler = http.server.SimpleHTTPRequestHandler
 
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
-            url = "http://localhost:8002/"
+            url = "https://kat-subtitle.netlify.app/"
             webbrowser.open_new(url)
             httpd.serve_forever()
 

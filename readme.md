@@ -6,13 +6,13 @@ KAT Subtitleは音声認識を用いて、VR Chatでしゃべった言葉を文�
 
 ## 動作環境
 
-Kuretan Avatar Text
+[Kuretan Avatar Text](https://kuretan.booth.pm/items/3962022)
 
-Google Chrome(Web Speech APIに利用します)
+[Google Chrome](https://www.google.com/chrome/)(Web Speech APIに利用します)
 
 ## 導入方法
 
-リリースまたはBoothからKAT Subtitlesをダウンロード
+[Booth](https://kuretan.booth.pm/items/3962809)からKAT Subtitlesをダウンロード
 
 ↓
 
@@ -20,20 +20,20 @@ KAT_Subtitle.exeを起動
 
 ### Charmapmakerを利用する場合
 
-KAT_Subtitle.exeと同じ階層のフォルダにCharmap Makerで作成したConvertlist.csvを導入してください。
-元々入っているConvertlistはサンプルアバター専用ですので、不要です。上書きして問題ありません。
+KAT_Subtitle.exeと同じ階層のフォルダにCharmap Makerで作成したConvertlistを導入してください。
+元々入っているConvertlistはサンプルアバター専用ですので、不要です。
 
 ## 主な機能
 
-- 音声を入力
-- 翻訳
+- タイピング or 音声認識した文章をVR Chat上で表示
+- Google 翻訳を用いて翻訳した文章VR Chatで表示
 - 外部ソフトを用いた音声合成
 
 ## 使い方
 
 ### 音声入力
 
-KAT_Subtitle.exeを起動すると、Chromeのウインドウ（localhost:8002)とエディタが起動します。
+KAT_Subtitle.exeを起動すると、Chromeのウインドウ[KAT Subtitle \| KAT Subtitle](https://kat-subtitle.netlify.app/)とエディタが起動します。
 
 ![image1](images/1.gif)
 
@@ -68,6 +68,7 @@ Chromeのウインドウの画面の中央部、聞き取る言語の右側に�
 
 この記事に従うと下記のようなURLが取得できます。(このURLは実際には機能しません。)
 
+
 https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec
 
 このURLをsettingのGASの欄に貼り付けてください。
@@ -76,9 +77,9 @@ https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI
 ### 音声合成
 
 KAT Subtitleは[棒読みちゃん](https://chi.usamimi.info/Program/Application/BouyomiChan/)に対応しています。
-棒読みちゃん対応には[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用します。棒読みちゃん本体のプラグインの設定ができたら、bouyomichan_client.jsというファイルをjsフォルダ化に保存します。
+棒読みちゃん対応には[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用します。棒読みちゃん本体にプラグインを導入してください。プラグイン導入後、KAT Subtitle起動と同時に棒読みちゃんを起動するだけで、後は棒読みちゃんが読み上げてくれるようになります。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。音声のON/OFFはブラウザの画面上のSetting->MAKE VOICEで調整できます。
 
-このプラグインを導入することで棒読みちゃんに発声させることができます。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。
+合成した音声のVR Chatへの出力方法に関しては各自Google等で検索してください。
 
 ## NGワード
 
@@ -94,16 +95,7 @@ KATを利用するにはOSCを有効にする必要があります。アクシ�
 ![OSC](images/098fafasdrt4359798909342retf.png)
 詳細に関しては[OSC Overview](https://docs.vrchat.com/docs/osc-overview)をご確認ください。
 
-
-Q.音声認識・翻訳されない
-
-A.ネットワークに問題があるか、過剰利用が原因でGoogleに規制されいる可能性があります。
-
-Q.Chromeの読み込みがいつまでも終わらない
-
-A.アプリを再起動してください。KAT Subtitleではローカルサーバーを利用します。これはChromeの関係上、ローカルサーバーを利用しないと、不具合が生じるからです。しかし、環境によってはローカルサーバーの立ち上げに問題が生じることがあります。
-
-問題が生じた場合は、ご自身でローカルサーバーを別に立てるか、index.htmlを直接chromeで開いてください。
+またVR ChatのOSC機能は元々不安定です。一度は正常に動作していたのに、急に動かなくなった場合、そのほとんどはVR Chat側の問題です。
 
 ## 開発者向け情報
 
