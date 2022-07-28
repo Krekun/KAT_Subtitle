@@ -120,11 +120,11 @@ class KATSubtitleGui:
             var = self.q_sentence.get().replace('"', "")
             if "/avatar/" in var:
                 address, value = var.split(",")
-                print(address, value)
-                try:
+                if value == "True":
+                    value =True
+                else:
                     value = float(value)
-                except ValueError:
-                    value = int(value)
+                print("sent", address, value)
                 self.kat.osc_client.send_message(address, value)
             else:
                 self.set_text(var)
