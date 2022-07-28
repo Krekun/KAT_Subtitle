@@ -170,15 +170,15 @@ class KatOsc:
         return text
 
     def remove_from_list_en(self, list, text):
-        temp_text =""
+        temp_text = ""
         for word in text.split(" "):
             for ng in list:
                 ng_title = ng.title()
-                if word.replace("/n","") == ng:
+                if word.replace("/n", "") == ng:
                     word = word.replace(ng, ng[0] + "x" * (len(ng) - 1))
-                if word.replace("/n","") == ng_title:
-                  word = word.replace(ng_title, ng_title[0] + "x" * (len(ng) - 1))
-            temp_text =temp_text+" "+"".join(word)
+                if word.replace("/n", "") == ng_title:
+                    word = word.replace(ng_title, ng_title[0] + "x" * (len(ng) - 1))
+            temp_text = temp_text + " " + "".join(word)
         return temp_text
 
     def remove_from_list_jp(self, list, text):
