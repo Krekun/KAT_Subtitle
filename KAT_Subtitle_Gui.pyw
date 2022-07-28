@@ -23,11 +23,15 @@ import os
 import sys
 import json
 from logging import getLogger, config
+
 import KAT_Subtitle_Lib
 import KAT_Subtitle_Websocket
 
+# main class
+# A class that creates a GUI.
+class KATSubtitleGui:
 
-class KAT_Subtitle_Gui:
+    # A GUI that allows you to enter text and send it to the KAT.
     def __init__(self, loop=None, _use_chrome=False):
         # Call Library
         file_path = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -55,6 +59,7 @@ class KAT_Subtitle_Gui:
         self.line_length = self.kat.line_length
         self.line_count = self.kat.line_count
         self.old_sentence = ""
+        self.present_sentence = ""
         self.queue = queue  # for multi threading
         self.max_letter_length = 64  # max length of a sentence
         self._use_chrome = _use_chrome
@@ -102,6 +107,7 @@ class KAT_Subtitle_Gui:
         self.window.protocol("WM_DELETE_WINDOW", self.close_window)
         self.window.mainloop()
 
+    # A function that asks if you want to close the window.
     def close_window(self):
         if messagebox.askokcancel("確認", "本当に閉じていいですか？"):
             self.set_text("")
@@ -110,8 +116,18 @@ class KAT_Subtitle_Gui:
     # For Chrome  web speech API
     def chrome_to_KAT(self):
         if not self.q_sentence.empty():
+            # check if sentence is json or not
             var = self.q_sentence.get().replace('"', "")
-            self.set_text(var)
+            if "/avatar/" in var:
+                address, value = var.split(",")
+                if value == "True":
+                    value = True
+                else:
+                    value = float(value)
+                print("sent", address, value)
+                self.kat.osc_client.send_message(address, value)
+            else:
+                self.set_text(var)
 
     # Set the text to any value
     def set_text(self, text: str):
@@ -175,4 +191,4 @@ class KAT_Subtitle_Gui:
 
 
 if __name__ == "__main__":
-    app = KAT_Subtitle_Gui(_use_chrome=True)
+    app = KATSubtitleGui(_use_chrome=True)
