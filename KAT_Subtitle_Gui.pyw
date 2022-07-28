@@ -121,7 +121,7 @@ class KATSubtitleGui:
             if "/avatar/" in var:
                 address, value = var.split(",")
                 if value == "True":
-                    value =True
+                    value = True
                 else:
                     value = float(value)
                 print("sent", address, value)
