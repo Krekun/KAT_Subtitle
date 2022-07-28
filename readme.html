@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>readme.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="kat-subtitle">KAT Subtitle</h1>
+<p><img src="images/1.gif" alt="image1"></p>
+<p>KAT Subtitleは音声認識を用いて、VR Chatでしゃべった言葉を文字として表示することのできるソフトウェアです。また自動翻訳や外部ソフトを利用することでの音声合成も可能です。NGワード除去機能付きなので、音声認識や翻訳ミスによる誤解を防ぐこともできます。</p>
+<h2 id="%E5%8B%95%E4%BD%9C%E7%92%B0%E5%A2%83">動作環境</h2>
+<p><a href="https://kuretan.booth.pm/items/3962022">Kuretan Avatar Text</a></p>
+<p><a href="https://www.google.com/chrome/">Google Chrome</a>(Web Speech APIに利用します)</p>
+<h2 id="%E5%B0%8E%E5%85%A5%E6%96%B9%E6%B3%95">導入方法</h2>
+<p><a href="https://kuretan.booth.pm/items/3962809">Booth</a>からKAT Subtitlesをダウンロード</p>
+<p>↓</p>
+<p>KAT_Subtitle.exeを起動</p>
+<h2 id="%E4%B8%BB%E3%81%AA%E6%A9%9F%E8%83%BD">主な機能</h2>
+<ul>
+<li>タイピング or 音声認識した文章をVR Chat上で表示</li>
+<li>Google 翻訳を用いて翻訳した文章VR Chatで表示</li>
+<li>外部ソフトを用いた音声合成</li>
+</ul>
+<h2 id="%E4%BD%BF%E3%81%84%E6%96%B9">使い方</h2>
+<h3 id="%E9%9F%B3%E5%A3%B0%E5%85%A5%E5%8A%9B">音声入力</h3>
+<p>KAT_Subtitle.exeを起動すると、convertlistの選択画面が起動します。<a href="https://kuretan.booth.pm/items/3962022">Kuretan Avatar Text</a>の無償版を利用している方は、ラノベPOP v2__21lines_converter.csvを、漢字対応版を利用されている方はラノベPOP v2__77lines_converter.csv　を選択してください。
+Charmapmakerで作成したconvertlistを利用する場合は、ご自身で作成されたconvertlistを選択してください。</p>
+<p>ファイル選択後、Chromeのウインドウ<a href="https://kat-subtitle.netlify.app/">KAT Subtitle | KAT Subtitle</a>とエディタが起動します。</p>
+<p><img src="images/1.gif" alt="image1"></p>
+<p><img src="images/3.gif" alt="image3"></p>
+<p>ChromeのウインドウはWeb Speech APIを用いた音声認識およびGoogle translateによる翻訳に使用します。マイクのアイコンを押すと音声認識が開始されます。</p>
+<p>認識された音声は画面の中央部に表示された後、二つ目のウインドウに送られてから、VR Chatに送られます。使用上64文字以上の文章は表示できないため、長文でしゃべることはできません。</p>
+<h3 id="%E6%89%8B%E5%8B%95%E5%85%A5%E5%8A%9B">手動入力</h3>
+<p>KAT Subtitleはタイピングによる入力にも採用しています。エディタ上に、直接文字を入力してください。文章の最後が「。」または「？」で終了した場合、エディタ上の文章はリセットされます。右側のClearボタンを押しても、テキストを消すことができます。</p>
+<p>Windows11をご利用の方は、windows11の標準音声入力をすることも可能です。文字入力欄を選択中にWindows+Hを押すと、音声入力が開始されます。音声入力の設定から句読点の自動挿入をオンにすると、文章が終わると自動的に入力内容がクリアされます。これにより一々文章を削除することなく、スムーズにしゃべり続けることができます。Web Speech APIとWindows11標準の音声入力の精度は大差ありませんので、お好みのほうをご利用ください</p>
+<h3 id="%E7%BF%BB%E8%A8%B3%E8%A6%81%E8%A8%AD%E5%AE%9A">翻訳（要設定）</h3>
+<p><img src="images/2.gif" alt="imager2"></p>
+<p>Chromeのウインドウの画面の中央部、聞き取る言語の右側にあるプルダウンメニューから聞き取る言語を指定します。翻訳すると書かれたボタンをクリックすると翻訳に関する項目が現れます。翻訳元言語と翻訳先言語を指定してください。音声認識と翻訳では使用しているAPIが異なるため、手動で翻訳元言語は指定してください。</p>
+<p>翻訳機能は外部APIを利用している関係上、デフォルトでは機能せず、設定が必要です。現在対応しているAPIはGoogle App Scriptのみです。今後のアプッデートではDeep Lをはじめ、複数の翻訳APIに対応していきます。</p>
+<h3 id="google-app-script%E3%82%92%E7%94%A8%E3%81%84%E3%81%9F%E7%BF%BB%E8%A8%B3%E6%96%B9%E6%B3%95">Google App Scriptを用いた翻訳方法</h3>
+<p>以下の記事にしたがい、翻訳用APIのURLを取得してください。</p>
+<p><a href="https://qiita.com/tanabee/items/c79c5c28ba0537112922">3 分で作る無料の翻訳 API with Google Apps Script - Qiita</a></p>
+<p>この記事に従うと下記のようなURLが取得できます。(このURLは実際には機能しません。)</p>
+<p>https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec</p>
+<p>このURLをsettingのGASの欄に貼り付けてください。
+<img src="images/4.gif" alt=""></p>
+<h3 id="%E9%9F%B3%E5%A3%B0%E5%90%88%E6%88%90">音声合成</h3>
+<p>KAT Subtitleは<a href="https://chi.usamimi.info/Program/Application/BouyomiChan/">棒読みちゃん</a>に対応しています。
+棒読みちゃん対応には<a href="https://github.com/ryujimiya/Plugin_BymChnWebSocket">棒読みちゃんWebSocketプラグイン</a>を利用します。棒読みちゃん本体にプラグインを導入してください。プラグイン導入後、KAT Subtitle起動と同時に棒読みちゃんを起動するだけで、後は棒読みちゃんが読み上げてくれるようになります。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。音声のON/OFFはブラウザの画面上のSetting-&gt;MAKE VOICEで調整できます。</p>
+<p>合成した音声のVR Chatへの出力方法に関しては各自Google等で検索してください。</p>
+<h2 id="ng%E3%83%AF%E3%83%BC%E3%83%89">NGワード</h2>
+<p>KAT SubtitleにはNGワード除去機能が備わっています。設定はsettingフォルダ以下のnglist_jp.csvとnglist_en.csvに保存されていますので、お好みに合わせて設定を変えることが可能です。</p>
+<h2 id="%E3%83%97%E3%83%A9%E3%82%A4%E3%83%90%E3%82%B7%E3%83%BC%E9%9D%A2%E3%81%AB%E9%96%A2%E3%81%97%E3%81%A6">プライバシー面に関して</h2>
+<p>音声入力あるいは翻訳した内容は、外部サーバーで処理を行っている関係上、部外者に内容が伝わるリスクがあることをご留意ください。特にWeb speech apiに関しては、個人情報の扱いに関する規定がはっきりしていません。
+KAT Subtitle利用時はくれぐれも機密情報や個人情報を入力しないでください。</p>
+<h2 id="qa">Q&amp;A</h2>
+<p>Q.文字化けする・文字が表示されない</p>
+<p>A.OSCが有効になっているか・Convertlistが破損していないか・Convertlistが現在使用しているシェーダーの画像に対応しているかを確認してください。</p>
+<p>KATを利用するにはOSCを有効にする必要があります。アクションメニューを開き、Setting-&gt;OSC-&gt;Enabledを選択してください。
+<img src="images/098fafasdrt4359798909342retf.png" alt="OSC">
+詳細に関しては<a href="https://docs.vrchat.com/docs/osc-overview">OSC Overview</a>をご確認ください。</p>
+<p>またVR ChatのOSC機能は元々不安定です。一度は正常に動作していたのに、急に動かなくなった場合、そのほとんどはVR Chat側の問題です。</p>
+<h2 id="%E9%96%8B%E7%99%BA%E8%80%85%E5%90%91%E3%81%91%E6%83%85%E5%A0%B1">開発者向け情報</h2>
+<p>VR Chatへの文字列の送信に関しては<a href="https://github.com/killfrenzy96/KatOscApp">KillFrenzy Avatar Text OSC App</a>を,音声認識部分に関しては<a href="https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api/">Web Speech API</a>を、翻訳に関して<a href="https://developers.google.com/apps-script">Apps Script  |  Google Developers</a>の翻訳機能を利用しています。また棒読みちゃんとの連携に関しては<a href="https://github.com/ryujimiya/Plugin_BymChnWebSocket">棒読みちゃんWebSocketプラグイン</a>を利用しています。</p>
+<h2 id="%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA">使用しているライブラリ</h2>
+<p><a href="https://github.com/killfrenzy96/KatOscApp">KillFrenzy Avatar Text OSC App</a></p>
+<p><a href="https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api/">Web Speech API</a></p>
+<p><a href="https://github.com/ryujimiya/Plugin_BymChnWebSocket">棒読みちゃんWebSocketプラグイン</a></p>
+<h2 id="%E3%83%A9%E3%82%A4%E3%82%BB%E3%83%B3%E3%82%B9">ライセンス</h2>
+<p>本ソフトウェアはGNU General Public Licenseで配布しています。本ソフトウェアを利用すことによって生じたいかなる損害に対しても私は責任を持ちません。すべて自己責任でよろしくお願いします。</p>
+<h2 id="%E3%81%AA%E3%81%9C%E3%81%93%E3%81%AE%E3%82%BD%E3%83%95%E3%83%88%E3%82%92%E4%BD%9C%E6%88%90%E3%81%97%E3%81%9F%E3%81%8B">なぜこのソフトを作成したか</h2>
+<p>私がVR Chatを始めたきっかけは英語の勉強をするためです。VRチャット上には語学の勉強に熱心な人がたくさんいます。彼らは熱心に言語交換をしていますが、しばしばうまくコミュニケーションがとれないことがあります。そんな際にVR Chat上に任意の文字を表示できたり、翻訳をしてくれる機能があったら便利だと思い、このアプリを作成しました。</p>
+<h2 id="%E5%AF%84%E4%BB%98">寄付</h2>
+<p>KAT SubtitleはKuretan個人により開発されたソフトウェアです。もしKAT Subtitleを気に入っていただけたら、Boothでのブースト購入等で支援がいただけたらありがたいです。TwitterやVR Chat上での感想やコメント・フィードバックもお待ちしています。</p>
+
+</body>
+</html>
