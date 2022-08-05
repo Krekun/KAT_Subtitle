@@ -33,7 +33,7 @@ class Websocket:
 
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             url = "https://kat-subtitle.netlify.app/"
-            webbrowser.open_new(url)
+            # webbrowser.open_new(url)
             httpd.serve_forever()
 
 

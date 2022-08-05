@@ -26,6 +26,7 @@ from logging import getLogger, config
 
 import KAT_Subtitle_Lib
 import KAT_Subtitle_Websocket
+import KAT_Subtitle_FASTAPI
 
 # main class
 # A class that creates a GUI.
@@ -41,20 +42,23 @@ class KATSubtitleGui:
         config.dictConfig(log_conf)
         logger = getLogger(__name__)
         logger.info("Start KAT_GUI")
-        title = "convertlistを選択"
-        filetypes = [("CSVファイル", "*.csv")]
-        root = Tk()
-        root.withdraw()
-        file = filedialog.askopenfilename(
-            title=title, filetypes=filetypes, initialdir=file_path
-        )
+        # title = "convertlistを選択"
+        # filetypes = [("CSVファイル", "*.csv")]
+        # root = Tk()
+        # root.withdraw()
+        # file = filedialog.askopenfilename(
+        #     title=title, filetypes=filetypes, initialdir=file_path
+        # )
+        file = r"C:\Users\baryo\Documents\Vrchat\KAT\KAT_Subtitle\ラノベPOP v2__77lines_converter.csv"
         self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop, file=file, logger=logger)
         # Call Websocket
         self.q_sentence = queue.Queue()
-        Threading_chrome = threading.Thread(
+        threading_chrome = threading.Thread(
             target=KAT_Subtitle_Websocket.Websocket, kwargs={"queue": self.q_sentence}
         )
-        Threading_chrome.start()
+        threading_chrome.start()
+        threading_fastapi = threading.Thread(target=KAT_Subtitle_FASTAPI.start_fastapi)
+        threading_fastapi.start()
         self.text_length = self.kat.text_length
         self.line_length = self.kat.line_length
         self.line_count = self.kat.line_count
