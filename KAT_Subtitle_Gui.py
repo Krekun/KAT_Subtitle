@@ -26,7 +26,6 @@ from logging import getLogger, config
 
 import KAT_Subtitle_Lib
 import KAT_Subtitle_Websocket
-import KAT_Subtitle_FASTAPI
 
 # main class
 # A class that creates a GUI.
@@ -57,8 +56,6 @@ class KATSubtitleGui:
             target=KAT_Subtitle_Websocket.Websocket, kwargs={"queue": self.q_sentence}
         )
         threading_chrome.start()
-        threading_fastapi = threading.Thread(target=KAT_Subtitle_FASTAPI.start_fastapi)
-        threading_fastapi.start()
         self.text_length = self.kat.text_length
         self.line_length = self.kat.line_length
         self.line_count = self.kat.line_count

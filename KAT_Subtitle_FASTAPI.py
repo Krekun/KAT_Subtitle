@@ -1,10 +1,12 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import KAT_Subtitle_editdatabase
 from pydantic import BaseModel
 from typing import Union
 
+import KAT_Subtitle_editdatabase
+import KAT_Subtitle_Lib
+import KAT_Subtitle_Gui
 
 edit_database = KAT_Subtitle_editdatabase.edit_database()
 app = FastAPI()
@@ -17,6 +19,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+Gui = KAT_Subtitle_Gui.KATSubtitleGui(_use_chrome=True)
 
 
 class Item(BaseModel):
