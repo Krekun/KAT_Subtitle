@@ -44,6 +44,8 @@ class KatOsc:
         file_path = os.path.dirname(os.path.abspath(sys.argv[0]))
         os.chdir(file_path)
         self.logger = logger
+        self.ismicmute = False
+
         self.logger.info("StartKatOSC")
         self.osc_ip = config.osc_ip
         self.osc_port = config.osc_port
@@ -133,7 +135,10 @@ class KatOsc:
                 self.osc_avatar_change_path + "*", self.osc_server_handler_avatar
             )
             # self.osc_dispatcher.map("*", print)
-            if loop == None:
+            self.osc_dispatcher.map("/avatar/parameters/MuteSelf", self.togglemic)
+            self.osc_dispatcher.map("/avatar/change", print)
+            self.osc_dispatcher.map("/avatar/parameters/TrackingType", print)
+            if loop is None:
                 loop = asyncio.get_event_loop()
             try:
                 self.osc_server = osc_server.ThreadingOSCUDPServer(
@@ -150,20 +155,23 @@ class KatOsc:
         # Start timer loop
         self.osc_timer.start()
 
+    def togglemic(self, _, muteself):
+        self.ismicmute = muteself
+
     # Set the text to any value
     def set_text(self, text: str):
-        # text = self.remove_offensive_word(text)
+        text = self.remove_offensive_word(text)
         self.target_text = text
 
     # Avoid Recognition/translation problem
     def remove_offensive_word(self, text: str) -> str:
         # nglist_en is retrived from https://www.freewebheaders.com/full-list-of-bad-words-banned-by-google/
         # nglist_jp is retrieved from https://dic.nicovideo.jp/a/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E7%94%9F%E6%94%BE%E9%80%81%3A%E9%81%8B%E5%96%B6ng%E3%83%AF%E3%83%BC%E3%83%89%E4%B8%80%E8%A6%A7
-        with open("nglist_en.csv", "r", encoding="UTF") as f:
+        with open("setting/nglist_en.csv", "r", encoding="UTF") as f:
             nglist_en = csv.reader(f, delimiter=",")
             for row in nglist_en:
                 text = self.remove_from_list_en(row, text)
-        with open("nglist_jp.csv", "r", encoding="UTF") as f:
+        with open("setting/nglist_jp.csv", "r", encoding="UTF") as f:
             nglist_jp = csv.reader(f, delimiter=",")
             for row in nglist_jp:
                 text = self.remove_from_list_jp(row, text)
