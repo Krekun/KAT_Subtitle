@@ -8,7 +8,12 @@ class edit_database:
         conn = sqlite3.connect(self.dbname)
         cur = conn.cursor()
         cur.execute(
-            "CREATE TABLE IF NOT EXISTS api_table(name STRING PRIMARY KEY, api_key STRING)"
+            "CREATE TABLE IF NOT EXISTS api_table(name STRING PRIMARY KEY, api_key STRING NOT NULL)"
+        )
+        cur.execute(
+            "CREATE TABLE IF NOT EXISTS spoken_sentences"
+            "(ID INTEGER PRIMARY KEY AUTOINCREMENT,spoken_sentence STRING NOT NULL,"
+            "created TIMESTAMP DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')))"
         )
         conn.commit()
         conn.close()
@@ -32,5 +37,23 @@ class edit_database:
         cur = conn.cursor()
         cur.execute("SELECT api_key from api_table where name =?", (api_name,))
         temp = cur.fetchone()
+        conn.close()
+        return temp
+
+    def update_spoken_sentences(self, sentence):
+        conn = sqlite3.connect(self.dbname)
+        cur = conn.cursor()
+        value_to_update = (sentence,)
+        cur.execute(
+            "INSERT INTO spoken_sentences(spoken_sentence) values(?)", value_to_update
+        )
+        conn.commit()
+        conn.close()
+
+    def get_spoken_sentences(self):
+        conn = sqlite3.connect(self.dbname)
+        cur = conn.cursor()
+        cur.execute("SELECT * from spoken_sentences")
+        temp = cur.fetchall()
         conn.close()
         return temp

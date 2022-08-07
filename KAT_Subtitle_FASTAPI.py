@@ -38,23 +38,23 @@ def get_conver_file(present_location: str) -> str:
     :param PRESENT_LOCATION: The path to the folder where the file is located
     :return: The file path of the file that the user selected.
     """
-    title = "convertlistを選択"
-    filetypes = [("CSVファイル", "*.csv")]
-    root = Tk()
-    root.withdraw()
-    file = filedialog.askopenfilename(
-        title=title, filetypes=filetypes, initialdir=PRESENT_LOCATION
-    )
-    # file = r"C:\Users\baryo\Documents\Vrchat\KAT\KAT_Subtitle\ラノベPOP v2__77lines_converter.csv"
+    # title = "convertlistを選択"
+    # filetypes = [("CSVファイル", "*.csv")]
+    # root = Tk()
+    # root.withdraw()
+    # file = filedialog.askopenfilename(
+    #     title=title, filetypes=filetypes, initialdir=PRESENT_LOCATION
+    # )
+    file = r"C:\Users\baryo\Documents\Vrchat\KAT\KAT_Subtitle\ラノベPOP v2__77lines_converter.csv"
     return file
 
 
 CONVERT_FILE = get_conver_file(PRESENT_LOCATION)
 Lib = KAT_Subtitle_Lib.KatOsc(file=CONVERT_FILE, logger=logger)
-threading_gui = threading.Thread(
-    target=KAT_Subtitle_Gui.KATSubtitleGui, kwargs={"logger": logger, "kat": Lib}
-)
-threading_gui.start()
+# threading_gui = threading.Thread(
+#     target=KAT_Subtitle_Gui.KATSubtitleGui, kwargs={"logger": logger, "kat": Lib}
+# )
+# threading_gui.start()
 #############
 
 
@@ -75,11 +75,12 @@ class Item(BaseModel):
     api_name: str
     url: str
 
-
 class TextMessage(BaseModel):
     text_type: str
     text_message: str
 
+class spoken_sentece(BaseModel):
+    spoken_sentece: str
 
 @app.get("/api_key/")
 def post_api_key() -> dict[str, str]:
@@ -106,6 +107,7 @@ def post_text_message(textmessage: TextMessage) -> None:
     if textmessage.text_type == "message":
         Lib.set_text(textmessage.text_message)
         print(textmessage.text_message)
+        edit_database.update_spoken_sentences(textmessage.text_message)
     elif textmessage.text_type == "osc-command":
         address, value = textmessage.text_message.split(",")
         if value == "True":
@@ -160,6 +162,14 @@ def toggle_mic() -> bool:
         else:
             break
     return Lib.ismicmute
+
+@app.get("/get-spoekn-sentences/")
+def get_spoken_sentences() ->list:
+    return edit_database.get_spoken_sentences()
+
+@app.post("/update-spoken-sentences/")
+def update_spoken_sentences(spoken_sentece: spoken_sentece):
+    edit_database.update_spoken_sentences(spoken_sentece.spoken_sentece)
 
 
 def start_fastapi():

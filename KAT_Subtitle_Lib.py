@@ -331,11 +331,11 @@ class KatOsc:
 
                     self.osc_text = self._list_to_string(osc_chars)
                     if self.old_sentence != gui_text:
-                        self.logger.info(
-                            "Sent {}".format(
-                                gui_text[0 : int(self.text_length / 2)].rstrip()
-                            )
-                        )
+                        # self.logger.info(
+                        #     "Sent {}".format(
+                        #         gui_text[0 : int(self.text_length / 2)].rstrip()
+                        #     )
+                        # )
                         self.old_sentence = gui_text
                     return
 
