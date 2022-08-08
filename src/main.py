@@ -146,6 +146,7 @@ def fetch_avatar_config(name) -> list:
 
 @app.get("/fetch-kat-version/")
 def fetch_kat_version():
+    logger.info("Connected to Web server")
     return float(0.3)
 
 
