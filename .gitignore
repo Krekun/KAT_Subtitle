@@ -23,3 +23,5 @@ tes.py
 *.exe
 Gatsby/
 KAT_Subtitle_server.py
+test.py
+main.db

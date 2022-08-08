@@ -14,58 +14,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from tkinter import Tk, Text, Button, messagebox, filedialog
+from tkinter import Tk, Text, Button, messagebox
 import math
 import time
-import threading
-import queue
 import os
-import sys
-import json
 from logging import getLogger, config
-
-import KAT_Subtitle_Lib
-import KAT_Subtitle_Websocket
 
 # main class
 # A class that creates a GUI.
 class KATSubtitleGui:
 
     # A GUI that allows you to enter text and send it to the KAT.
-    def __init__(self, loop=None, _use_chrome=False):
+    def __init__(self, loop=None, logger=None, kat=None):
         # Call Library
-        file_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-        os.chdir(file_path)
-        with open("log_config.json", "r", encoding="UTF") as f:
-            log_conf = json.load(f)
-        config.dictConfig(log_conf)
-        logger = getLogger(__name__)
-        logger.info("Start KAT_GUI")
-        title = "convertlistを選択"
-        filetypes = [("CSVファイル", "*.csv")]
-        root = Tk()
-        root.withdraw()
-        file = filedialog.askopenfilename(
-            title=title, filetypes=filetypes, initialdir=file_path
-        )
-        self.kat = KAT_Subtitle_Lib.KatOsc(loop=loop, file=file, logger=logger)
-        # Call Websocket
-        self.q_sentence = queue.Queue()
-        Threading_chrome = threading.Thread(
-            target=KAT_Subtitle_Websocket.Websocket, kwargs={"queue": self.q_sentence}
-        )
-        Threading_chrome.start()
+        logger.info("Start GUI")
+        self.kat = kat
         self.text_length = self.kat.text_length
         self.line_length = self.kat.line_length
         self.line_count = self.kat.line_count
         self.old_sentence = ""
         self.present_sentence = ""
-        self.queue = queue  # for multi threading
         self.max_letter_length = 64  # max length of a sentence
-        self._use_chrome = _use_chrome
         self.delay = 0.25  #
-        if _use_chrome:
-            KAT_Subtitle_Lib.RepeatedTimer(self.delay, self.chrome_to_KAT)
         # --------------
         # GUI Setup
         # --------------
@@ -112,22 +82,6 @@ class KATSubtitleGui:
         if messagebox.askokcancel("確認", "本当に閉じていいですか？"):
             self.set_text("")
             os._exit(0)
-
-    # For Chrome  web speech API
-    def chrome_to_KAT(self):
-        if not self.q_sentence.empty():
-            # check if sentence is json or not
-            var = self.q_sentence.get().replace('"', "")
-            if "/avatar/" in var:
-                address, value = var.split(",")
-                if value == "True":
-                    value = True
-                else:
-                    value = float(value)
-                print("sent", address, value)
-                self.kat.osc_client.send_message(address, value)
-            else:
-                self.set_text(var)
 
     # Set the text to any value
     def set_text(self, text: str):
@@ -191,4 +145,4 @@ class KATSubtitleGui:
 
 
 if __name__ == "__main__":
-    app = KATSubtitleGui(_use_chrome=True)
+    app = KATSubtitleGui()
