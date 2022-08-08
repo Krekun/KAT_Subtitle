@@ -1,7 +1,7 @@
 import sqlite3
 
 
-class edit_database:
+class Edit_database:
     def __init__(self) -> None:
         # Setup database
         self.dbname = "main.db"

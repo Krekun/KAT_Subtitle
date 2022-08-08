@@ -6,28 +6,27 @@ import sys
 import json
 from tkinter import Tk, filedialog
 from time import sleep
+from argparse import ArgumentParser
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
+import webbrowser
 
-import KAT_Subtitle_editdatabase
-import KAT_Subtitle_Lib
+import edit_database
+import lib
 
-# Setting Log file
-PRESENT_LOCATION = os.path.dirname(os.path.abspath(sys.argv[0]))
-with open("log_config.json", "r", encoding="UTF") as f:
-    log_conf = json.load(f)
-config.dictConfig(log_conf)
-logger = getLogger(__name__)
-logger.info("Start FAST_api")
-CONFIGFILES = glob.glob(
-    os.path.expanduser("~") + "\\AppData\\LocalLow\\VRChat\\VRChat\\OSC\\\**\\*.json",
-    recursive=True,
+app = FastAPI()
+# To avoid a CORS problem
+# https://qiita.com/satto_sann/items/0e1f5dbbe62efc612a78
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-#
-# run external library
 
 
 def get_conver_file(present_location: str) -> str:
@@ -48,21 +47,12 @@ def get_conver_file(present_location: str) -> str:
     return file
 
 
-CONVERT_FILE = get_conver_file(PRESENT_LOCATION)
-Lib = KAT_Subtitle_Lib.KatOsc(file=CONVERT_FILE, logger=logger)
-
-
-edit_database = KAT_Subtitle_editdatabase.edit_database()
-app = FastAPI()
-# To avoid a CORS problem
-# https://qiita.com/satto_sann/items/0e1f5dbbe62efc612a78
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+PRESENT_LOCATION = os.path.dirname(os.path.abspath(sys.argv[0]))
+os.chdir(PRESENT_LOCATION)
+with open("log_config.json", "r", encoding="UTF") as f:
+    log_conf = json.load(f)
+config.dictConfig(log_conf)
+logger = getLogger(__name__)
 
 
 class Item(BaseModel):
@@ -145,6 +135,7 @@ def fetch_avatar_config(name) -> list:
 
 @app.get("/fetch-kat-version/")
 def fetch_kat_version():
+    logger.info("Connected to Web server")
     return float(0.3)
 
 
@@ -182,5 +173,31 @@ def start_fastapi():
     uvicorn.run(app, host="127.0.0.1", port=8080, log_level="info")
 
 
+def get_option():
+    parser = ArgumentParser()
+    parser.add_argument("--no_web", action="store_true", help="not open chrome")
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = get_option()
+    if not args.no_web:
+        URL = "kuretan-lab.com"
+        try:
+            browser = webbrowser.get(
+                '"C:\Program Files\Google\Chrome\Application\chrome.exe" %s '
+            )
+            browser.open_new(URL)
+        except:
+            logger.warning("Fail to run Chrome.")
+            webbrowser.open(URL)
+    logger.info("Start FAST_api")
+    CONFIGFILES = glob.glob(
+        os.path.expanduser("~")
+        + "\\AppData\\LocalLow\\VRChat\\VRChat\\OSC\\\**\\*.json",
+        recursive=True,
+    )
+    CONVERT_FILE = get_conver_file(PRESENT_LOCATION)
+    Lib = lib.KatOsc(file=CONVERT_FILE, logger=logger)
+    edit_database = edit_database.Edit_database()
     start_fastapi()
