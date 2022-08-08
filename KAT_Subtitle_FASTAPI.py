@@ -5,7 +5,7 @@ import glob
 import sys
 import json
 from tkinter import Tk, filedialog
-import threading
+from time import sleep
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,7 +14,6 @@ import uvicorn
 
 import KAT_Subtitle_editdatabase
 import KAT_Subtitle_Lib
-import KAT_Subtitle_Gui
 
 # Setting Log file
 PRESENT_LOCATION = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -38,24 +37,19 @@ def get_conver_file(present_location: str) -> str:
     :param PRESENT_LOCATION: The path to the folder where the file is located
     :return: The file path of the file that the user selected.
     """
-    # title = "convertlistを選択"
-    # filetypes = [("CSVファイル", "*.csv")]
-    # root = Tk()
-    # root.withdraw()
-    # file = filedialog.askopenfilename(
-    #     title=title, filetypes=filetypes, initialdir=PRESENT_LOCATION
-    # )
-    file = r"C:\Users\baryo\Documents\Vrchat\KAT\KAT_Subtitle\ラノベPOP v2__77lines_converter.csv"
+    title = "convertlistを選択"
+    filetypes = [("CSVファイル", "*.csv")]
+    root = Tk()
+    root.withdraw()
+    file = filedialog.askopenfilename(
+        title=title, filetypes=filetypes, initialdir=PRESENT_LOCATION
+    )
+    # file = r"C:\Users\baryo\Documents\Vrchat\KAT\KAT_Subtitle\ラノベPOP v2__77lines_converter.csv"
     return file
 
 
 CONVERT_FILE = get_conver_file(PRESENT_LOCATION)
 Lib = KAT_Subtitle_Lib.KatOsc(file=CONVERT_FILE, logger=logger)
-# threading_gui = threading.Thread(
-#     target=KAT_Subtitle_Gui.KATSubtitleGui, kwargs={"logger": logger, "kat": Lib}
-# )
-# threading_gui.start()
-#############
 
 
 edit_database = KAT_Subtitle_editdatabase.edit_database()
@@ -75,15 +69,18 @@ class Item(BaseModel):
     api_name: str
     url: str
 
+
 class TextMessage(BaseModel):
     text_type: str
     text_message: str
 
+
 class spoken_sentece(BaseModel):
     spoken_sentece: str
 
+
 @app.get("/api_key/")
-def post_api_key() -> dict[str, str]:
+def get_api_key() -> dict[str, str]:
     """
     It gets the api_key from the database and returns it as a dictionary.
     :return: A dictionary with the api_type as the key and the api_key as the value.
@@ -96,7 +93,7 @@ def post_api_key() -> dict[str, str]:
     return dic
 
 
-@app.post("/api_key/")
+@app.put("/api_key/")
 async def update_api_key(item: Item) -> None:
     edit_database.update_api_table(item.api_name, item.url)
 
@@ -121,7 +118,6 @@ def post_text_message(textmessage: TextMessage) -> None:
 @app.get("/fetch-all-avatar-name")
 def fetch_all_avatar_name() -> list:
     lis = []
-    inc = 0
     for filenames in CONFIGFILES:
         json_open = open(
             filenames,
@@ -149,23 +145,33 @@ def fetch_avatar_config(name) -> list:
 
 @app.get("/fetch-kat-version/")
 def fetch_kat_version():
-    return float(3.1)
+    return float(0.3)
 
 
 @app.get("/toggle-mic/")
 def toggle_mic() -> bool:
+    """
+    It sends a message to the server to toggle the mic on or off.
+    Try five times and raise erro in case of failure
+    :return: a boolean value.
+    """
     temp = Lib.ismicmute
-    while True:
+    inc = 0
+    while inc < 10:
         if Lib.ismicmute == temp:
             Lib.osc_client.send_message("/input/Voice", True)
+            sleep(0.5)
             Lib.osc_client.send_message("/input/Voice", float(0.0))
         else:
-            break
-    return Lib.ismicmute
+            return Lib.ismicmute
+        inc += 1
+    raise HTTPException(status_code=500, detail="fail to mute mic")
+
 
 @app.get("/get-spoekn-sentences/")
-def get_spoken_sentences() ->list:
+def get_spoken_sentences() -> list:
     return edit_database.get_spoken_sentences()
+
 
 @app.post("/update-spoken-sentences/")
 def update_spoken_sentences(spoken_sentece: spoken_sentece):
