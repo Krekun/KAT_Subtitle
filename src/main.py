@@ -12,11 +12,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 
-import KAT_Subtitle_editdatabase
-import KAT_Subtitle_Lib
+import edit_database
+import lib
 
 # Setting Log file
 PRESENT_LOCATION = os.path.dirname(os.path.abspath(sys.argv[0]))
+os.chdir(PRESENT_LOCATION)
 with open("log_config.json", "r", encoding="UTF") as f:
     log_conf = json.load(f)
 config.dictConfig(log_conf)
@@ -49,10 +50,10 @@ def get_conver_file(present_location: str) -> str:
 
 
 CONVERT_FILE = get_conver_file(PRESENT_LOCATION)
-Lib = KAT_Subtitle_Lib.KatOsc(file=CONVERT_FILE, logger=logger)
+Lib = lib.KatOsc(file=CONVERT_FILE, logger=logger)
 
 
-edit_database = KAT_Subtitle_editdatabase.edit_database()
+edit_database = edit_database.Edit_database()
 app = FastAPI()
 # To avoid a CORS problem
 # https://qiita.com/satto_sann/items/0e1f5dbbe62efc612a78

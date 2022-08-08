@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from KAT_Subtitle_FASTAPI import app
+from main import app
 import os
 import sys
 from tkinter import messagebox
