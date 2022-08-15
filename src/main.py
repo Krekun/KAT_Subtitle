@@ -1,3 +1,4 @@
+from lib2to3.pytree import convert
 from logging import getLogger, config
 import json
 import os
@@ -7,9 +8,11 @@ import json
 from tkinter import Tk, filedialog
 from time import sleep
 from argparse import ArgumentParser
+from typing import Final, Union
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 import uvicorn
 import webbrowser
@@ -29,7 +32,7 @@ app.add_middleware(
 )
 
 
-def get_conver_file(present_location: str) -> str:
+def get_conver_file(PRESENT_LOCATION: str) -> str:
     """
     It opens a file dialog box and returns the path of the file selected by the user
 
@@ -43,11 +46,12 @@ def get_conver_file(present_location: str) -> str:
     file = filedialog.askopenfilename(
         title=title, filetypes=filetypes, initialdir=PRESENT_LOCATION
     )
-    # file = r"C:\Users\baryo\Documents\Vrchat\KAT\KAT_Subtitle\ラノベPOP v2__77lines_converter.csv"
+    # file = PRESENT_LOCATION + "//ラノベPOP v2__77lines_converter.csv"
+    root.destroy()  # you need to destroy Tk windows if you want to run this function again
     return file
 
 
-PRESENT_LOCATION = os.path.dirname(os.path.abspath(sys.argv[0]))
+PRESENT_LOCATION: Final[str] = os.path.dirname(os.path.abspath(sys.argv[0]))
 os.chdir(PRESENT_LOCATION)
 with open("log_config.json", "r", encoding="UTF") as f:
     log_conf = json.load(f)
@@ -65,8 +69,12 @@ class TextMessage(BaseModel):
     text_message: str
 
 
-class spoken_sentece(BaseModel):
+class SpokenSentence(BaseModel):
     spoken_sentece: str
+
+
+class ConfigSetting(BaseModel):
+    change_convert_file: Union[bool, None]
 
 
 @app.get("/api_key/")
@@ -84,13 +92,23 @@ def get_api_key() -> dict[str, str]:
 
 
 @app.put("/api_key/")
-async def update_api_key(item: Item) -> None:
+def update_api_key(item: Item) -> None:
     edit_database.update_api_table(item.api_name, item.url)
 
 
 @app.post("/text-message/")
 def post_text_message(textmessage: TextMessage) -> None:
-    # raise HTTPException(status_code=456, detail="item_not_found")
+    """
+    It takes a TextMessage object, and depending on the text_type attribute, it either sets the text of
+    the textbox, updates the database, or sends an OSC message
+    class TextMessage(BaseModel):
+        text_type: str
+        text_message: str
+    text_type:
+        message:Sentence for KAT
+        osc-command: OSC command
+        offical-text-chat:Sentence for offical text chat
+    """
     if textmessage.text_type == "message":
         Lib.set_text(textmessage.text_message)
         print(textmessage.text_message)
@@ -103,10 +121,20 @@ def post_text_message(textmessage: TextMessage) -> None:
             value = float(value)
         print(address, value)
         Lib.osc_client.send_message(address, value)
+    elif textmessage.text_type == "offical-text-chat":
+        Lib.osc_client.send_message("/chatbox/input", (textmessage.text_message, True))
+    else:
+        raise HTTPException(status_code=422, detail="item_not_found")
+    # elif textmessage.text_type == "toggle-offical-text-chat":
+    #     Lib.osc_client.send_message("/chatbox/typing", True)
 
 
 @app.get("/fetch-all-avatar-name")
 def fetch_all_avatar_name() -> list:
+    """
+    It opens all the files in the CONFIGFILES list, and then appends the name of the avatar to a list
+    :return: A list of all the names of the avatars.
+    """
     lis = []
     for filenames in CONFIGFILES:
         json_open = open(
@@ -120,7 +148,14 @@ def fetch_all_avatar_name() -> list:
 
 
 @app.get("/fetch-avatar-config/{name}")
-def fetch_avatar_config(name) -> list:
+def fetch_avatar_config(name: str) -> list:
+    """
+    It opens a json file, loads it, and if the name in the json file matches the name passed to the
+    function, it returns the json file
+
+    :param name: The name of the avatar you want to fetch
+    :return: A list of dictionaries.
+    """
     for filenames in CONFIGFILES:
         json_open = open(
             filenames,
@@ -135,8 +170,12 @@ def fetch_avatar_config(name) -> list:
 
 @app.get("/fetch-kat-version/")
 def fetch_kat_version():
+    """
+    This function check the connection to a web server and returns the version of the local server
+    :return: The version of the KAT software.
+    """
     logger.info("Connected to Web server")
-    return float(0.3)
+    return float(0.31)
 
 
 @app.get("/toggle-mic/")
@@ -148,7 +187,7 @@ def toggle_mic() -> bool:
     """
     temp = Lib.ismicmute
     inc = 0
-    while inc < 10:
+    while inc < 3:
         if Lib.ismicmute == temp:
             Lib.osc_client.send_message("/input/Voice", True)
             sleep(0.5)
@@ -161,12 +200,35 @@ def toggle_mic() -> bool:
 
 @app.get("/get-spoekn-sentences/")
 def get_spoken_sentences() -> list:
+    """
+    > This function returns a list of sentences that have been spoken by the user
+    :return: A list of spoken sentences.
+    """
     return edit_database.get_spoken_sentences()
 
 
 @app.post("/update-spoken-sentences/")
-def update_spoken_sentences(spoken_sentece: spoken_sentece):
-    edit_database.update_spoken_sentences(spoken_sentece.spoken_sentece)
+def update_spoken_sentences(spoken_sentece: SpokenSentence):
+    """
+    Update the spoken sentences in the database
+    """
+    edit_database.update_spoken_sentences(spoken_sentece.SpokenSentence)
+
+
+@app.get("/")
+def index() -> None:
+    return RedirectResponse(url="/docs/")
+
+
+@app.put("/config")
+def change_config(config: ConfigSetting) -> None:
+    """
+    Upadate config setting
+    """
+    if config.change_convert_file:
+        NEW_CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION)
+        new_config = lib.KatOscConfig(file=NEW_CONVERT_FILE)
+        Lib.change_setting(config=new_config)
 
 
 def start_fastapi():
@@ -182,7 +244,7 @@ def get_option():
 if __name__ == "__main__":
     args = get_option()
     if not args.no_web:
-        URL = "kuretan-lab.com"
+        URL: Final[str] = "kuretan-lab.com"
         try:
             browser = webbrowser.get(
                 '"C:\Program Files\Google\Chrome\Application\chrome.exe" %s '
@@ -192,12 +254,13 @@ if __name__ == "__main__":
             logger.warning("Fail to run Chrome.")
             webbrowser.open(URL)
     logger.info("Start FAST_api")
-    CONFIGFILES = glob.glob(
+    CONFIGFILES: Final[list] = glob.glob(
         os.path.expanduser("~")
         + "\\AppData\\LocalLow\\VRChat\\VRChat\\OSC\\\**\\*.json",
         recursive=True,
     )
-    CONVERT_FILE = get_conver_file(PRESENT_LOCATION)
-    Lib = lib.KatOsc(file=CONVERT_FILE, logger=logger)
+    CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION)
+    Lib_config = lib.KatOscConfig(file=CONVERT_FILE, logger_object=logger)
+    Lib = lib.KatOsc(config=Lib_config)
     edit_database = edit_database.Edit_database()
     start_fastapi()
