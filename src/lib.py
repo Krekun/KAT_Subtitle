@@ -19,32 +19,60 @@ from threading import Timer
 from pythonosc import udp_client, osc_server, dispatcher
 import math, asyncio, threading, sys, os, csv
 from tkinter import messagebox
+from dataclasses import dataclass
+from typing import Any
 
 
+@dataclass(frozen=True)
 class KatOscConfig:
-    def __init__(self):
-        self.osc_ip = "127.0.0.1"  # OSC network IP
-        self.osc_port = 9000  # OSC network port for sending messages
+    """
+    store the configuration for the OSC
+    """
 
-        self.osc_enable_server = True  # Used to improve sync with in-game avatar and autodetect sync parameter count used for the avatar.
-        self.osc_server_ip = "127.0.0.1"  # OSC server IP to listen too
-        self.osc_server_port = 9001  # OSC network port for recieving messages
+    osc_ip: str = "127.0.0.1"  # OSC network IP
+    osc_port: int = 9000  # OSC network port for sending messages
 
-        self.osc_delay = 0.25  # Delay between network updates in seconds. Setting this too low will cause issues.
-        self.sync_params = 4  # Default sync parameters. This is automatically updated if the OSC server is enabled.
+    osc_enable_server: bool = True  # Used to improve sync with in-game avatar and autodetect sync parameter count used for the avatar.
+    osc_server_ip: str = "127.0.0.1"  # OSC server IP to listen too
+    osc_server_port: str = 9001  # OSC network port for recieving messages
 
-        self.line_length = 32  # Characters per line of text
-        self.line_count = 4  # Maximum lines of text
+    osc_delay: float = 0.25  # Delay between network updates in seconds. Setting this too low will cause issues.
+    sync_params: int = 4  # Default sync parameters. This is automatically updated if the OSC server is enabled.
+    line_length: int = 32  # Characters per line of text
+    line_count: int = 8  # Maximum lines of text
+    text_length: int = 256  # Maximum length of text
+    file: str = None
+    loop: Any = None
+    logger_object: Any = None
+
+    def __post_init__(self):
+        """
+        Validate inputs
+        """
+        variables = [
+            self.osc_delay,
+            self.sync_params,
+            self.line_length,
+            self.line_count,
+            self.text_length,
+        ]
+        for value in variables:
+            if value <= 0:
+                raise ValueError("Parametrs should be valid number")
 
 
 class KatOsc:
     def __init__(
-        self, loop=None, file=None, logger=None, config: KatOscConfig = KatOscConfig()
+        self,
+        config: KatOscConfig = KatOscConfig(),
     ):
         file_path = os.path.dirname(os.path.abspath(sys.argv[0]))
         os.chdir(file_path)
-        self.logger = logger
+
         self.ismicmute = False
+        self.file = config.file
+        self.loop = config.loop
+        self.logger = config.logger_object
 
         self.logger.info("StartKatOSC")
         self.osc_ip = config.osc_ip
@@ -57,10 +85,10 @@ class KatOsc:
         self.osc_delay = config.osc_delay
         self.sync_params = config.sync_params
 
-        self.line_length = config.line_length
-        self.line_count = config.line_count
+        self.line_length = config.line_length  # Characters per line of text
+        self.line_count = config.line_count  # Maximum lines of text
+        self.text_length = config.text_length  # Maximum length of text
 
-        self.text_length = 128  # Maximum length of text
         self.sync_params_max = 35  # Maximum sync parameters
         self.old_sentence = ""
 
@@ -79,28 +107,11 @@ class KatOsc:
         self.osc_avatar_change_path = "/avatar/change"
         self.osc_text = ""
         self.target_text = ""
-        # Read convert list
-        try:
-            with open(file, "r", encoding="UTF") as f:
-                reader = csv.reader(f)
-                self.letters_list = [row for row in reader]
-            self.logger.info("Convertlist {} was loaded successfully".format(file))
-        except:
-            message = "Convertlistが見当たりません。"
-            self.logger.critical(message)
-            messagebox.showwarning("エラー", message)
-            os._exit(1)
+
         self.invalid_char = "?"  # character used to replace invalid characters
         self.conv_key1 = {}
         self.conv_key2 = {}
-        for i in range(0, len(self.letters_list)):
-            self.conv_key1[self.letters_list[i][0]] = i % 128
-            self.conv_key2[self.letters_list[i][0]] = int(i / 128)
-        self.conv_key1[" "] = 0  # 応急処置　BOMの処理がうまくいかない
-        # self.conv_key2[" "]=0#応急処置　BOMの処理がうまくいかない
-
-        # Character to use in place of unknown characters
-        self.invalid_char_value = self.conv_key1.get(self.invalid_char, 0)
+        self.read_convertlist()
 
         # --------------
         # OSC Setup
@@ -136,24 +147,55 @@ class KatOsc:
             )
             # self.osc_dispatcher.map("*", print)
             self.osc_dispatcher.map("/avatar/parameters/MuteSelf", self.togglemic)
-            self.osc_dispatcher.map("/avatar/change", print)
-            self.osc_dispatcher.map("/avatar/parameters/TrackingType", print)
-            if loop is None:
-                loop = asyncio.get_event_loop()
+            # self.osc_dispatcher.map("/avatar/change", print)
+            # self.osc_dispatcher.map("/avatar/parameters/TrackingType", print)
+            if self.loop is None:
+                self.loop = asyncio.get_event_loop()
             try:
                 self.osc_server = osc_server.ThreadingOSCUDPServer(
                     (self.osc_server_ip, self.osc_server_port),
                     self.osc_dispatcher,
-                    loop,
+                    self.loop,
                 )
                 threading.Thread(target=self.osc_server_start, daemon=True).start()
             except:
-                message = "同時に複数の起動はできません。"
+                message = (
+                    "同時に複数の起動はできません。 You cannot run two KAT Subtitles at the same time"
+                )
                 self.logger.critical(message)
                 messagebox.showwarning("エラー", message)
                 os._exit(1)
         # Start timer loop
         self.osc_timer.start()
+
+    def read_convertlist(self):
+        # Read convert list
+        try:
+            with open(self.file, "r", encoding="UTF") as f:
+                reader = csv.reader(f)
+                self.letters_list = [row for row in reader]
+            self.logger.info(f"Convertlist {self.file} was loaded successfully")
+        except:
+            message = "Convertlistが見当たりません。 Convertlist is missing."
+            self.logger.critical(message)
+            messagebox.showwarning("エラー", message)
+            os._exit(1)
+
+        for i in range(0, len(self.letters_list)):
+            self.conv_key1[self.letters_list[i][0]] = i % 128
+            self.conv_key2[self.letters_list[i][0]] = int(i / 128)
+        self.conv_key1[" "] = 0  # ad-hoc fix
+        # Character to use in place of unknown characters
+        self.invalid_char_value = self.conv_key1.get(self.invalid_char, 0)
+
+    def change_setting(self, config: KatOscConfig = KatOscConfig()):
+        self.line_length = config.line_length  # Characters per line of text
+        self.line_count = config.line_count  # Maximum lines of text
+        self.text_length = config.text_length  # Maximum length of text
+        self.file = config.file
+        self.pointer_count = int(self.text_length / self.sync_params)
+        self.read_convertlist()
+        print("Config changed")
 
     def togglemic(self, _, muteself):
         self.ismicmute = muteself
@@ -178,6 +220,8 @@ class KatOsc:
         return text
 
     def remove_from_list_en(self, list, text):
+        # Replacing the words in the list with the first letter of the word and the rest of the word is
+        # replaced with x's.
         temp_text = ""
         for word in text.split(" "):
             for ng in list:
@@ -300,14 +344,12 @@ class KatOsc:
                         index = (pointer_index * self.sync_params) + char_index
                         gui_char = gui_text[index]
                         # Convert character to the key value, replace invalid characters
-                        if index < 64:
+                        if index < int(self.text_length / 2):
                             key = self.conv_key1.get(gui_char, None)
                             if key == None:
                                 key = self.invalid_char_value
                                 self.logger.warning(
-                                    "illegal letter {} detected. Replaced with ?".format(
-                                        gui_char
-                                    )
+                                    f"invalid letter {gui_char} detected. Replaced with ?"
                                 )
 
                         else:
@@ -331,11 +373,6 @@ class KatOsc:
 
                     self.osc_text = self._list_to_string(osc_chars)
                     if self.old_sentence != gui_text:
-                        # self.logger.info(
-                        #     "Sent {}".format(
-                        #         gui_text[0 : int(self.text_length / 2)].rstrip()
-                        #     )
-                        # )
                         self.old_sentence = gui_text
                     return
 

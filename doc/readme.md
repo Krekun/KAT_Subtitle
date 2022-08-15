@@ -1,6 +1,4 @@
-# KAT Subtitle
-
-![image1](images/1.gif)
+![image1](images/20220809_001.gif)
 
 KAT Subtitleは音声認識を用いて、VR Chatでしゃべった言葉を文字として表示することのできるソフトウェアです。また自動翻訳や外部ソフトを利用することでの音声合成も可能です。NGワード除去機能付きなので、音声認識や翻訳ミスによる誤解を防ぐこともできます。
 
@@ -10,55 +8,90 @@ KAT Subtitleは音声認識を用いて、VR Chatでしゃべった言葉を文�
 
 [Google Chrome](https://www.google.com/chrome/)(Web Speech APIに利用します)
 
+Web Speech APIの仕様状、Chronium(Edge)では挙動が不安定です。Chromeを使用してください。
+
 ## 導入方法
 
-[Booth](https://kuretan.booth.pm/items/3962809)からKAT Subtitlesをダウンロード
+### サンプルアバターを使用する場合
+[KAT Subtitles](https://kuretan.booth.pm/items/3962809)をダウンロード
 
 ↓
 
 KAT_Subtitle.exeを起動
 
+### 自分のアバターに導入する場合
+[Kuretan Avatar Text ](https://kuretan.booth.pm/items/3962022)をご自身のアバターに導入してください。
+以降はサンプルアバターを使用するのと同じです。
 
 ## 主な機能
 
 - タイピング or 音声認識した文章をVR Chat上で表示
-- Google 翻訳を用いて翻訳した文章VR Chatで表示
+- 入力した文章のログの記録
+- Google 翻訳/DeepL 翻訳を用いて翻訳した文章をVR Chatで表示
 - 外部ソフトを用いた音声合成
+- OSC機能を用いた任意のパラメータの操作
 
 ## 使い方
 
-### 音声入力
+### KAT　Subtitleの起動
 
-KAT_Subtitle.exeを起動すると、convertlistの選択画面が起動します。[Kuretan Avatar Text](https://kuretan.booth.pm/items/3962022)の無償版を利用している方は、ラノベPOP v2__21lines_converter.csvを、漢字対応版を利用されている方はラノベPOP v2__77lines_converter.csv　を選択してください。
-Charmapmakerで作成したconvertlistを利用する場合は、ご自身で作成されたconvertlistを選択してください。
+KAT_Subtitle.exeを起動すると、ターミナル画面が表示されます。ターミナル画面にはログが表示されます。
 
-ファイル選択後、Chromeのウインドウ[KAT Subtitle \| KAT Subtitle](https://kat-subtitle.netlify.app/)とエディタが起動します。
+KAT Subtitleを終了する際はこのターミナル画面を閉じてください
+![](images/20220809_003.png)
 
-![image1](images/1.gif)
+しばらく待つとconvertlistの選択画面が起動します。
+![](images/20220809_002.png)
 
-![image3](images/3.gif)
+VR ChatのOSCは使用上数値しか送ることができません。そのため、文字を数値に変換する必要があります。
+convertlistは数値を文字に変換するために使用する表にあたります。
+選択画面が表示されましたら、ご自身の環境に合わせてファイルを選択してください。
 
-ChromeのウインドウはWeb Speech APIを用いた音声認識およびGoogle translateによる翻訳に使用します。マイクのアイコンを押すと音声認識が開始されます。
+[Kuretan Avatar Text](https://kuretan.booth.pm/items/3962022)の無償版
 
-認識された音声は画面の中央部に表示された後、二つ目のウインドウに送られてから、VR Chatに送られます。使用上64文字以上の文章は表示できないため、長文でしゃべることはできません。
+>ラノベPOP v2__21lines_converter.csv、
 
-### 手動入力
+[Kuretan Avatar Text](https://kuretan.booth.pm/items/3962022)の漢字対応版
 
-KAT Subtitleはタイピングによる入力にも採用しています。エディタ上に、直接文字を入力してください。文章の最後が「。」または「？」で終了した場合、エディタ上の文章はリセットされます。右側のClearボタンを押しても、テキストを消すことができます。
+>ラノベPOP v2__77lines_converter.csv
 
-Windows11をご利用の方は、windows11の標準音声入力をすることも可能です。文字入力欄を選択中にWindows+Hを押すと、音声入力が開始されます。音声入力の設定から句読点の自動挿入をオンにすると、文章が終わると自動的に入力内容がクリアされます。これにより一々文章を削除することなく、スムーズにしゃべり続けることができます。Web Speech APIとWindows11標準の音声入力の精度は大差ありませんので、お好みのほうをご利用ください
+[KAT　Charmapmaker](https://kuretan.booth.pm/items/3962822)を利用する場合
 
+>ご自身で作成されたconvertlist.csv
 
-### 翻訳（要設定）
+ファイル選択後、Webアプリ[KAT Subtitle](https://kuretan-lab.com/)とが起動します。
+![image1](images/20220809_001.gif)
 
-![imager2](images/2.gif)
+### 音声認識&手動入力
 
-Chromeのウインドウの画面の中央部、聞き取る言語の右側にあるプルダウンメニューから聞き取る言語を指定します。翻訳すると書かれたボタンをクリックすると翻訳に関する項目が現れます。翻訳元言語と翻訳先言語を指定してください。音声認識と翻訳では使用しているAPIが異なるため、手動で翻訳元言語は指定してください。
+マイクのアイコンを押すと音声認識が開始されます。
 
+認識された音声は画面の中央部に表示された後、ローカルサーバーを通じてVR Chatに送られます。送信された文字はターミナル画面に表示されます。非対応の文字を入力した場合は以下のような警告が表示されます。
+![警告](images/20220809_004.png)
+KAT Subtitleでは非対応の文字を?の記号に置き換えています。
 
-翻訳機能は外部APIを利用している関係上、デフォルトでは機能せず、設定が必要です。現在対応しているAPIはGoogle App Scriptのみです。今後のアプッデートではDeep Lをはじめ、複数の翻訳APIに対応していきます。
+非対応の文字だけど、VR Chat上で表示させたいという方は、ご自身で文字データーを作成されるか、あるいは[KAT　Charmapmaker](https://kuretan.booth.pm/items/3962822)のご購入をおすすめします。一般的な日本語の文章が入力できれば十分という方には[Kuretan Avatar Text](https://kuretan.booth.pm/items/3962022)の漢字対応版をおすすめします。
 
-### Google App Scriptを用いた翻訳方法
+現在の仕様上、64文字以上の文章は表示できません。音声認識中に文字数が64文字を超えた場合、超過した文字はVR Chat上では表示されません。
+
+KAT Subtitleはタイピングによる手入力に対応しています。エディタ上に、直接文字を入力してください。
+![手入力](images/20220809_005.gif)
+
+### 翻訳に関して
+
+![](images/20220809_006.gif)
+
+画面の中央部のプルダウンメニューから聞き取る言語を指定します。TRANSLATEボタンをクリックすると翻訳に関する項目が現れます。
+翻訳機能は外部APIを利用している関係上、デフォルトでは機能せず、設定が必要です。
+現在はGoogle翻訳(Google App Script)とDeep Lに対応しています。
+
+Google翻訳を利用する場合は翻訳元言語と翻訳先言語を指定してください。
+DeepLでは翻訳後の言語の指定のみでOKです。
+
+音声認識した文章に関しては自動で翻訳されますが、手動で入力した場合は
+Translate this sentence をクリックしてください。
+
+### Google翻訳(Google App Script)を用いた翻訳方法
 
 以下の記事にしたがい、翻訳用APIのURLを取得してください。
 
@@ -69,53 +102,163 @@ Chromeのウインドウの画面の中央部、聞き取る言語の右側に�
 
 https://script.google.com/macros/s/TC7lrH6Wvgfvdfvgdbtrr9fVJ6z_ghf6ZIrg4wf85FKkI6AzG/exec
 
-このURLをsettingのGASの欄に貼り付けてください。
-![](images/4.gif)
+このURLをGAS_URLの欄に貼り付けてください。入力したURLはローカルサーバーに保存されるので、一度入力すれば以降は入力が不要となります。
+![GAS](images/20220809_007.png)
 
-### 音声合成
+## DeepLを用いた翻訳
+
+DeepL翻訳にはDeepLのAPIを利用します。
+
+APIの利用にはAuthentication Keyが必要です。取得にはDeepLへ登録する必要があります。
+
+[DeepL Pro \| Translate Text, Word Docs & Other Docs Securely](https://www.deepl.com/pro/change-plan#developer)
+
+また登録に際してクレジットカードの登録が必要となりますが、無料版を利用する分には料金はかかりません。また現在は無料版のAPIのみ対応しています。
+
+DeepLへのAPI利用申請ができましたら、[DeepL account](https://www.deepl.com/account/summary)内にあるAuthentication Key for DeepL APIをコピーします。![DeepL](images/20220809_008.png)
+
+Authentication KeyをKAT SubtitleのDeepL_Authの欄に貼り付けたら設定終了です。Authentication Keyはローカルサーバーに保存されます。
+
+![](images/20220809_009.png)
+
+## 音声合成
 
 KAT Subtitleは[棒読みちゃん](https://chi.usamimi.info/Program/Application/BouyomiChan/)に対応しています。
-棒読みちゃん対応には[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用します。棒読みちゃん本体にプラグインを導入してください。プラグイン導入後、KAT Subtitle起動と同時に棒読みちゃんを起動するだけで、後は棒読みちゃんが読み上げてくれるようになります。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。音声のON/OFFはブラウザの画面上のSetting->MAKE VOICEで調整できます。
+棒読みちゃん対応には[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用します。
 
-合成した音声のVR Chatへの出力方法に関しては各自Google等で検索してください。
+棒読みちゃん本体にプラグインを導入してください。KAT Subtitleではデフォルトで音声合成を無効にしています。有効にするにはSettingからMAKE VOICEをONにしてください。
+
+設定終了後は、棒読みちゃんを起動しておくだけで、自動で入力した文章を読み上げてくれるようになります。翻訳をオフにしている際は認識した音声を、翻訳をオンにした際は翻訳語の文章を読み上げてくれます。
+
+棒読みちゃんの音声をVR Chatへ出力する方法に関しては各自Google等で検索してください。
+
+## OSCを用いた任意のパラメータの変更
+
+![](images/20220809_010.png)
+
+アバターの任意のパラメータを変更する機能です。例えば小物のの出し入れや、衣装の変更に使えます。
+
+自動的にVR ChatがPC内に保存している設定ファイルを読み込みます。
+
+設定ファイルに関する詳細はこちらを確認してください。
+[OSC Avatar Parameters](https://docs.vrchat.com/docs/osc-avatar-parameters)
+
+USEOSCを選択すると、プルダウンメニューが表示されます。
+このプルダウンメニューには選択可能なアバターの一覧が表示されますので、現在使用しているアバターを選択してください。アバターを選択すると、もう一つ新たにプルダウンメニューが表示されます。
+
+プルダウンメニューから変更したいパラメータを選択してください。
+![](images/2.png)
+選択した項目に応じたメニューが表示されます。
+
+選択したパラメータがBooleanの場合、TrueとFalseが表示されます。
+![](images/3.png)
+
+Trueボタンを選択すると、そのパラメータをTrue(ON)にできます。
+
+選択したパラメータがFloatあるいはintの場合は数値を設定できます。
+![](images/4.png)
+
+![](images/5.png)
+Floatは-1から+1までの0.01刻み、intは0-255までの1刻みで選択が可能です。
+Sendボタンで設定した値を送信できます。
+
+今後のアップデートでは音声認識による操作に対応していく予定です。
+
+## VR Chat上のマイクのオン/オフ
+
+画面下部に表示されるマイクをクリックするとVR Chat上でのマイクのオン/オフの切り替えを行えます。現状では挙動が不安なため、うまく動作しない可能性があります。。　
+
+## Log
+
+![Log](images/20220809_011.png)
+
+LOGにはこれまでに入力した文章が記録されています。語学学習の際の復習に活用できます。
+現在の仕様上、特定の文章を削除、編集することはできません。
+
+またデーターはすべてユーザーのPC内（main.db:SQlite）に保存されており、Webサーバー上には保存されていません。
+
+## 起動オプションについて
+
+exeファイルを起動する際に --no_web　を追加すると、Webアプリを起動せず、ローカルサーバーのみ起動できます。
+
+## APIに関して
+
+APIを公開しています。APIの詳細に関しては、KAT Subtitle起動後、[Swagger UI](http://localhost:8080/docs)を確認してください。APIを利用することで、独自の音声認識ソフトや翻訳ソフトが使用できます。
 
 ## NGワード
 
-KAT SubtitleにはNGワード除去機能が備わっています。設定はsettingフォルダ以下のnglist_jp.csvとnglist_en.csvに保存されていますので、お好みに合わせて設定を変えることが可能です。
+KAT SubtitleにはNGワード除去機能が備わっています。設定はsettingフォルダ以下のnglist_jp.csvとnglist_en.csvに保存されています。お好みに合わせて設定を変えることが可能です。
 
-## プライバシー面に関して
+## プライバシーに関して
 
 音声入力あるいは翻訳した内容は、外部サーバーで処理を行っている関係上、部外者に内容が伝わるリスクがあることをご留意ください。特にWeb speech apiに関しては、個人情報の扱いに関する規定がはっきりしていません。
-KAT Subtitle利用時はくれぐれも機密情報や個人情報を入力しないでください。
+
+このWebサイト自体のプライバシーポリシーに関しては[Privacy Policy \| Kuretan's lab](https://kuretan-lab.com/Privacy/)を確認してください。
+
 
 ## Q&A
 
-Q.文字化けする・文字が表示されない
 
-A.OSCが有効になっているか・Convertlistが破損していないか・Convertlistが現在使用しているシェーダーの画像に対応しているかを確認してください。
+### Q.文字化けする・文字が表示されない
+
+### A.以下の事項を確認してください
+
+1. OSCが有効になっているか
+2. Convertlistが破損していないか
+3. 適切なConvertlistを利用しているか
 
 KATを利用するにはOSCを有効にする必要があります。アクションメニューを開き、Setting->OSC->Enabledを選択してください。
 ![OSC](images/098fafasdrt4359798909342retf.png)
 詳細に関しては[OSC Overview](https://docs.vrchat.com/docs/osc-overview)をご確認ください。
 
-またVR ChatのOSC機能は元々不安定です。一度は正常に動作していたのに、急に動かなくなった場合、そのほとんどはVR Chat側の問題です。
+またVR ChatのOSC機能は元々不安定です。一度は正常に動作していたのに、急に動かなくなった場合、そのほとんどはVR Chat側の問題です。またVR Chatの仕様上、Show Avatarが必要となることがあります。
+
+### 他人からうまく文字が見えないといわれた
+
+### A.以下の事項を確認してください
+
+1. Quest版を利用していないか
+2. セーフティレベルに問題はないか
+3. 回線に問題はないか
+
+KATはQuestに対応していないので、Questユーザーには見えません。またセーフティレベルの設定によっては、show avatrが必要となります。回線が重い場合は、適切に表示することができません。
 
 ## 開発者向け情報
 
-VR Chatへの文字列の送信に関しては[KillFrenzy Avatar Text OSC App](https://github.com/killfrenzy96/KatOscApp)を,音声認識部分に関しては[Web Speech API](https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api/)を、翻訳に関して[Apps Script  \|  Google Developers](https://developers.google.com/apps-script)の翻訳機能を利用しています。また棒読みちゃんとの連携に関しては[棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)を利用しています。
+### フロントエンド
 
+React+Gatsby
 
-## 使用しているライブラリ
+### ローカルサーバー
+
+Python(FastAPI)
+
+### データーベース
+
+SQlite
+
+### VR Chatへの文字列の送信
 
 [KillFrenzy Avatar Text OSC App](https://github.com/killfrenzy96/KatOscApp)
 
+### 音声認識API
+
 [Web Speech API](https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api/)
+
+### 翻訳API
+
+[Apps Script  \|  Google Developers](https://developers.google.com/apps-script)
+
+[DeepL API](https://www.deepl.com/pro/change-plan#developer)
+
+### 合成音声
 
 [棒読みちゃんWebSocketプラグイン](https://github.com/ryujimiya/Plugin_BymChnWebSocket)
 
+
 ## ライセンス
 
-本ソフトウェアはGNU General Public Licenseで配布しています。本ソフトウェアを利用すことによって生じたいかなる損害に対しても私は責任を持ちません。すべて自己責任でよろしくお願いします。
+本ソフトウェアのローカルサーバーに関してはGNU General Public Licenseで配布しています。Webアプリに関しては現在非公開ですが、将来的には公開する予定です。本ソフトウェアを利用すことによって生じたいかなる損害に対しても私は責任を持ちません。すべて自己責任でよろしくお願いします。
 
 ## なぜこのソフトを作成したか
 
