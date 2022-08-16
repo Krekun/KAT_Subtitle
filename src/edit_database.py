@@ -15,6 +15,11 @@ class Edit_database:
             "(ID INTEGER PRIMARY KEY AUTOINCREMENT,spoken_sentence STRING NOT NULL,"
             "created TIMESTAMP DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')))"
         )
+        cur.execute(
+            "CREATE TABLE IF NOT EXISTS avatar_config"
+            "(blueprint STRING PRIMARY KEY ,update_date TIMESTAMP , value json NOT NULL,"
+            "created TIMESTAMP DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')))"
+        )
         conn.commit()
         conn.close()
 
@@ -55,5 +60,39 @@ class Edit_database:
         cur = conn.cursor()
         cur.execute("SELECT * from spoken_sentences")
         temp = cur.fetchall()
+        conn.close()
+        return temp
+
+    def update_avatar_config(self, blueprint, date, value):
+        conn = sqlite3.connect(self.dbname)
+        cur = conn.cursor()
+        temp = str(value).replace("'", '"') #Without this replace, json will be broken
+        cur.execute(
+            "SELECT EXISTS(SELECT  * FROM avatar_config WHERE blueprint=?)",
+            (blueprint,),
+        )
+        is_data_exist = cur.fetchone()[0]
+        if is_data_exist == 0:
+            cur.execute(
+                "INSERT INTO avatar_config(blueprint,update_date,value) values(?,?,?)",
+                (blueprint, date, temp),
+            )
+        else:
+            pass
+            # cur.execute(
+            #     "UPDATE avatar_config set value = ?  WHERE blueprint=?",
+            #     (
+            #         temp,
+            #         blueprint,
+            #     ),
+            # )
+        conn.commit()
+        conn.close()
+
+    def get_avatar_config(self, blueprint):
+        conn = sqlite3.connect(self.dbname)
+        cur = conn.cursor()
+        cur.execute("SELECT value from avatar_config where blueprint =?", (blueprint,))
+        temp = cur.fetchone()
         conn.close()
         return temp

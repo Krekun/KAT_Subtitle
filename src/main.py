@@ -1,6 +1,7 @@
 from logging import getLogger, config
 import json
 import os
+import datetime
 import glob
 import sys
 import json
@@ -145,12 +146,17 @@ def fetch_all_avatar_name() -> list:
             encoding="utf_8_sig",
         )
         json_load = json.load(json_open)
-        lis.append(json_load["name"])
+        name = json_load["name"]
+        blueprint = json_load["id"]
+        time = os.path.getmtime(filenames)
+        date = datetime.datetime.fromtimestamp(time)
+        edit_database.update_avatar_config(blueprint, date, json_load)
+        lis.append((blueprint, name))
     return lis
 
 
-@app.get("/fetch-avatar-config/{name}")
-def fetch_avatar_config(name: str) -> list:
+@app.get("/fetch-avatar-config/{blueprint}")
+def fetch_avatar_config(blueprint: str) -> list:
     """
     It opens a json file, loads it, and if the name in the json file matches the name passed to the
     function, it returns the json file
@@ -158,16 +164,13 @@ def fetch_avatar_config(name: str) -> list:
     :param name: The name of the avatar you want to fetch
     :return: A list of dictionaries.
     """
-    for filenames in CONFIGFILES:
-        json_open = open(
-            filenames,
-            "r",
-            encoding="utf_8_sig",
-        )
-        json_load = json.load(json_open)
-        if json_load["name"] == name:
-            return json_load
-    raise HTTPException(status_code=422, detail="item_not_found")
+    json_config = edit_database.get_avatar_config(blueprint)
+    json_data = json_config[0]
+    json_load = json.loads(json_data)
+    if json is None:
+        raise HTTPException(status_code=422, detail="item_not_found")
+    else:
+        return json_load
 
 
 @app.get("/fetch-kat-version/")
