@@ -177,7 +177,7 @@ def fetch_kat_version():
     :return: The version of the KAT software.
     """
     logger.info("Connected to Web server")
-    return float(0.31)
+    return float(0.32)
 
 
 @app.get("/toggle-mic/")
@@ -255,8 +255,12 @@ def get_option():
         help="read the default convertfile\
         ラノベPOP v2__77lines_converter.csv",
     )
-    parser.add_argument("--host_ip", help="ip of local server default: 127.0.0.1", default="127.0.0.1")
-    parser.add_argument("--port", help="port of local server default:8080", default=8080, type=int)
+    parser.add_argument(
+        "--host_ip", help="ip of local server default: 127.0.0.1", default="127.0.0.1"
+    )
+    parser.add_argument(
+        "--port", help="port of local server default:8080", default=8080, type=int
+    )
     return parser.parse_args()
 
 

@@ -26,3 +26,4 @@ KAT_Subtitle_server.py
 test.py
 main.db
 extra-hooks
+*.ps1
