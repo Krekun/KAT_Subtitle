@@ -2,8 +2,10 @@ import sqlite3
 
 
 class Edit_database:
-    def __init__(self) -> None:
+    def __init__(self, logger_object=None) -> None:
         # Setup database
+        self.logger = logger_object
+        self.logger.info("Edit_database")
         self.dbname = "main.db"
         conn = sqlite3.connect(self.dbname)
         cur = conn.cursor()
@@ -101,6 +103,9 @@ class Edit_database:
         conn = sqlite3.connect(self.dbname)
         cur = conn.cursor()
         blueprint = json_config["id"]
+        self.logger.info(json_config["name"])
+        self.logger.info(blueprint)
+        # json_config["parameters"][0]["name"] = "お試し中"
         temp = str(json_config).replace("'", '"')
         cur.execute(
             "UPDATE avatar_config set value=? where blueprint =?",

@@ -80,6 +80,10 @@ class ConfigSetting(BaseModel):
     change_convert_file: Union[bool, None]
 
 
+class avatar_config(BaseModel):
+    avatar_config: str
+
+
 @app.get("/api_key/")
 def get_api_key() -> dict[str, str]:
     """
@@ -171,6 +175,14 @@ def fetch_avatar_config(blueprint: str) -> list:
         raise HTTPException(status_code=422, detail="item_not_found")
     else:
         return json_load
+
+
+@app.put("/save-avatar-config/")
+def save_avatar_config(avatar_config: avatar_config) -> None:
+    # print(avatar_config)
+    json_config = json.loads(str(avatar_config.avatar_config))
+    # print(json_config)
+    edit_database.save_avatar_config(json_config)
 
 
 @app.get("/fetch-kat-version/")
@@ -288,5 +300,5 @@ if __name__ == "__main__":
     CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION, args.no_select)
     Lib_config = lib.KatOscConfig(file=CONVERT_FILE, logger_object=logger)
     Lib = lib.KatOsc(config=Lib_config)
-    edit_database = edit_database.Edit_database()
+    edit_database = edit_database.Edit_database(logger_object=logger)
     start_fastapi(host=args.host_ip, port=args.port)
