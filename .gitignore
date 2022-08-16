@@ -27,3 +27,4 @@ test.py
 main.db
 extra-hooks
 *.ps1
+SQLiteDatabaseBrowserPortable/
