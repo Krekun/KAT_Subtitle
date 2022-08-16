@@ -1,4 +1,3 @@
-from lib2to3.pytree import convert
 from logging import getLogger, config
 import json
 import os
@@ -9,13 +8,14 @@ from tkinter import Tk, filedialog
 from time import sleep
 from argparse import ArgumentParser
 from typing import Final, Union
+import webbrowser
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 import uvicorn
-import webbrowser
+
 
 import edit_database
 import lib
@@ -32,7 +32,7 @@ app.add_middleware(
 )
 
 
-def get_conver_file(PRESENT_LOCATION: str) -> str:
+def get_conver_file(PRESENT_LOCATION: str, select: bool = True) -> str:
     """
     It opens a file dialog box and returns the path of the file selected by the user
 
@@ -41,13 +41,15 @@ def get_conver_file(PRESENT_LOCATION: str) -> str:
     """
     title = "convertlistを選択"
     filetypes = [("CSVファイル", "*.csv")]
-    root = Tk()
-    root.withdraw()
-    file = filedialog.askopenfilename(
-        title=title, filetypes=filetypes, initialdir=PRESENT_LOCATION
-    )
-    # file = PRESENT_LOCATION + "//ラノベPOP v2__77lines_converter.csv"
-    root.destroy()  # you need to destroy Tk windows if you want to run this function again
+    if select:
+        root = Tk()
+        root.withdraw()
+        file = filedialog.askopenfilename(
+            title=title, filetypes=filetypes, initialdir=PRESENT_LOCATION
+        )
+        root.destroy()  # you need to destroy Tk windows if you want to run this function again
+    else:
+        file = PRESENT_LOCATION + "//ラノベPOP v2__77lines_converter.csv"
     return file
 
 
@@ -217,6 +219,9 @@ def update_spoken_sentences(spoken_sentece: SpokenSentence):
 
 @app.get("/")
 def index() -> None:
+    """
+    Redirect to documents
+    """
     return RedirectResponse(url="/docs/")
 
 
@@ -226,18 +231,32 @@ def change_config(config: ConfigSetting) -> None:
     Upadate config setting
     """
     if config.change_convert_file:
-        NEW_CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION)
+        NEW_CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION, True)
         new_config = lib.KatOscConfig(file=NEW_CONVERT_FILE)
         Lib.change_setting(config=new_config)
 
 
-def start_fastapi():
-    uvicorn.run(app, host="127.0.0.1", port=8080, log_level="info")
+def start_fastapi(host: str = "127.0.0.1", port: int = 8080):
+    """
+    Start local server
+    """
+    uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 def get_option():
+    """
+    Read argument
+    """
     parser = ArgumentParser()
     parser.add_argument("--no_web", action="store_true", help="not open chrome")
+    parser.add_argument(
+        "--no_select",
+        action="store_false",
+        help="read the default convertfile\
+        ラノベPOP v2__77lines_converter.csv",
+    )
+    parser.add_argument("--host_ip", help="ip of local server default: 127.0.0.1", default="127.0.0.1")
+    parser.add_argument("--port", help="port of local server default:8080", default=8080, type=int)
     return parser.parse_args()
 
 
@@ -259,8 +278,8 @@ if __name__ == "__main__":
         + "\\AppData\\LocalLow\\VRChat\\VRChat\\OSC\\\**\\*.json",
         recursive=True,
     )
-    CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION)
+    CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION, args.no_select)
     Lib_config = lib.KatOscConfig(file=CONVERT_FILE, logger_object=logger)
     Lib = lib.KatOsc(config=Lib_config)
     edit_database = edit_database.Edit_database()
-    start_fastapi()
+    start_fastapi(host=args.host_ip, port=args.port)
