@@ -66,7 +66,7 @@ class Edit_database:
     def update_avatar_config(self, blueprint, date, value):
         conn = sqlite3.connect(self.dbname)
         cur = conn.cursor()
-        temp = str(value).replace("'", '"') #Without this replace, json will be broken
+        temp = str(value).replace("'", '"')  # Without this replace, json will be broken
         cur.execute(
             "SELECT EXISTS(SELECT  * FROM avatar_config WHERE blueprint=?)",
             (blueprint,),
@@ -96,3 +96,15 @@ class Edit_database:
         temp = cur.fetchone()
         conn.close()
         return temp
+
+    def save_avatar_config(self, json_config):
+        conn = sqlite3.connect(self.dbname)
+        cur = conn.cursor()
+        blueprint = json_config["id"]
+        temp = str(json_config).replace("'", '"')
+        cur.execute(
+            "UPDATE avatar_config set value=? where blueprint =?",
+            (temp, blueprint),
+        )
+        conn.commit()
+        conn.close()
