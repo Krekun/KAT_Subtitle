@@ -29,7 +29,7 @@ from typing import Any
 from pythonosc import udp_client, osc_server, dispatcher
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class KatOscConfig:
     """
     store the configuration for the OSC
@@ -108,6 +108,7 @@ class KatOsc:
 
         self.osc_parameter_prefix = "/avatar/parameters/"
         self.osc_avatar_change_path = "/avatar/change"
+        self.osc_loading_path = "/avatar/parameters/is_loading"
         self.osc_text = ""
         self.target_text = ""
 
@@ -125,9 +126,7 @@ class KatOsc:
         self.osc_timer = RepeatedTimer(self.osc_delay, self.osc_timer_loop)
 
         # Clear KAT text
-        self.osc_client.send_message(
-            self.osc_parameter_prefix + self.param_pointer, self.pointer_clear
-        )
+        self._clear_text()
         # Reset KAT characters sync
         for value in range(self.sync_params):
             self.osc_client.send_message(
@@ -170,7 +169,9 @@ class KatOsc:
         self.osc_timer.start()
 
     def read_convertlist(self):
-        # Read convert list
+        """
+        Read convert list
+        """
         try:
             with open(self.file, "r", encoding="UTF") as f:
                 reader = csv.reader(f)
@@ -184,23 +185,24 @@ class KatOsc:
 
         # KAT uses two letters to show one letter such as a,1 ->あ
         # you need to convert letters into a pair of letters such as あ　->a,1
-        for i in range(0, len(self.letters_list)):
-            self.conv_key1[self.letters_list[i][0]] = i % 128
-            self.conv_key2[self.letters_list[i][0]] = int(i / 128)
+        for i, key in enumerate(self.letters_list):
+            self.conv_key1[key[0]] = i % 128
+            self.conv_key2[key[0]] = int(i / 128)
         self.conv_key1[" "] = 0  # ad-hoc fix
         # Character to use in place of unknown characters
         self.invalid_char_value = self.conv_key1.get(self.invalid_char, 0)
 
-    def change_setting(self, config: KatOscConfig = KatOscConfig()):
+    def change_convertlist(self, file):
         """
         Change setting over using KAT
         """
-        self.line_length = config.line_length  # Characters per line of text
-        self.line_count = config.line_count  # Maximum lines of text
-        self.text_length = config.text_length  # Maximum length of text
-        self.file = config.file
-        self.pointer_count = int(self.text_length / self.sync_params)
+        self.file = file
         self.read_convertlist()
+        self.logger.info("Config changed")
+
+    def change_text_length(self, text_length):
+        self.text_length = text_length  # Maximum length of text
+        self.pointer_count = int(self.text_length / self.sync_params)
         self.logger.info("Config changed")
 
     def toggle_mic(self, _: str, muteself: bool) -> None:
@@ -270,9 +272,7 @@ class KatOsc:
         if self.osc_enable_server:
             if self.osc_server_test_step > 0:
                 # Keep text cleared during test
-                self.osc_client.send_message(
-                    self.osc_parameter_prefix + self.param_pointer, self.pointer_clear
-                )
+                self._clear_text()
 
                 if self.osc_server_test_step == 1:
                     # Reset sync parameters count
@@ -316,9 +316,7 @@ class KatOsc:
 
         # Sends clear text message if all text is empty
         if gui_text.strip("\n").strip(" ") == "":
-            self.osc_client.send_message(
-                self.osc_parameter_prefix + self.param_pointer, self.pointer_clear
-            )
+            self._clear_text()
             self.osc_text = " ".ljust(self.text_length)
             return
 
@@ -338,6 +336,9 @@ class KatOsc:
 
         # Text syncing
         if gui_text != self.osc_text:  # GUI text is different, needs sync
+            # Keep text clear to avoid text garbling
+            self._clear_text()
+            self.load_start()
             self.hide()
             osc_chars = list(osc_text)
 
@@ -394,9 +395,15 @@ class KatOsc:
                     self.osc_text = self._list_to_string(osc_chars)
                     if self.old_sentence != gui_text:
                         self.old_sentence = gui_text
-                    sleep(1)
-        self.show()
+                    sleep(0.5)  #
+            self.load_end()
+            sleep(0.1)
+            self.show()
         return
+
+    def resend_text(self) -> None:
+        self.set_text(self.old_sentence)
+        print("resemt")
 
     def osc_server_start(self) -> None:
         """
@@ -431,6 +438,11 @@ class KatOsc:
         lines = max(math.ceil(len(text) / self.line_length), 1)
         return self.line_length * lines
 
+    def _clear_text(self) ->None:
+        self.osc_client.send_message(
+                self.osc_parameter_prefix + self.param_pointer, self.pointer_clear
+        )
+
     # Stop the timer and hide the text overlay
     def stop(self):
         self.osc_timer.stop()
@@ -452,6 +464,14 @@ class KatOsc:
         self.osc_client.send_message(
             self.osc_parameter_prefix + self.param_visible, False
         )
+
+    def load_start(self):
+        self.osc_client.send_message(self.osc_loading_path, True)
+        pass
+
+    def load_end(self):
+        self.osc_client.send_message(self.osc_loading_path, False)
+        pass
 
 
 class RepeatedTimer(object):

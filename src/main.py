@@ -4,11 +4,10 @@ import os
 import datetime
 import glob
 import sys
-import json
 from tkinter import Tk, filedialog
 from time import sleep
 from argparse import ArgumentParser
-from typing import Final, Union
+from typing import Any, Final, Union
 import webbrowser
 
 from fastapi import FastAPI, HTTPException
@@ -76,12 +75,16 @@ class SpokenSentence(BaseModel):
     spoken_sentece: str
 
 
-class ConfigSetting(BaseModel):
-    change_convert_file: Union[bool, None]
-
-
 class avatar_config(BaseModel):
     avatar_config: str
+class ConfigSetting(BaseModel):
+    """
+    `ConfigSetting` is a class that has four attributes: `text_length`.
+    """
+
+    new_convert_file: bool
+    text_length: Union[int,None]
+
 
 
 @app.get("/api_key/")
@@ -229,7 +232,8 @@ def update_spoken_sentences(spoken_sentece: SpokenSentence):
     """
     Update the spoken sentences in the database
     """
-    edit_database.update_spoken_sentences(spoken_sentece.SpokenSentence)
+    if (spoken_sentece.spoken_sentece != ""):
+        edit_database.update_spoken_sentences(spoken_sentece.SpokenSentence)
 
 
 @app.get("/")
@@ -240,15 +244,23 @@ def index() -> None:
     return RedirectResponse(url="/docs/")
 
 
+
 @app.put("/config")
-def change_config(config: ConfigSetting) -> None:
+def change_config(config_value: ConfigSetting) -> None:
     """
     Upadate config setting
     """
-    if config.change_convert_file:
+    # print(config_value.text_length)
+    if config_value.new_convert_file:
         NEW_CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION, True)
-        new_config = lib.KatOscConfig(file=NEW_CONVERT_FILE)
-        Lib.change_setting(config=new_config)
+        if NEW_CONVERT_FILE == "":
+            raise HTTPException(status_code=500, detail="Select a file")
+        else:
+            Lib.change_convertlist(NEW_CONVERT_FILE)
+            Lib.resend_text()
+    if config_value.text_length:
+        Lib.change_text_length(config_value.text_length)
+    
 
 
 def start_fastapi(host: str = "127.0.0.1", port: int = 8080):
