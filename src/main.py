@@ -77,14 +77,15 @@ class SpokenSentence(BaseModel):
 
 class avatar_config(BaseModel):
     avatar_config: str
+
+
 class ConfigSetting(BaseModel):
     """
     `ConfigSetting` is a class that has four attributes: `text_length`.
     """
 
     new_convert_file: bool
-    text_length: Union[int,None]
-
+    text_length: Union[int, None]
 
 
 @app.get("/api_key/")
@@ -232,7 +233,7 @@ def update_spoken_sentences(spoken_sentece: SpokenSentence):
     """
     Update the spoken sentences in the database
     """
-    if (spoken_sentece.spoken_sentece != ""):
+    if spoken_sentece.spoken_sentece != "":
         edit_database.update_spoken_sentences(spoken_sentece.SpokenSentence)
 
 
@@ -242,7 +243,6 @@ def index() -> None:
     Redirect to documents
     """
     return RedirectResponse(url="/docs/")
-
 
 
 @app.put("/config")
@@ -260,7 +260,6 @@ def change_config(config_value: ConfigSetting) -> None:
             Lib.resend_text()
     if config_value.text_length:
         Lib.change_text_length(config_value.text_length)
-    
 
 
 def start_fastapi(host: str = "127.0.0.1", port: int = 8080):
@@ -288,29 +287,39 @@ def get_option():
     parser.add_argument(
         "--port", help="port of local server default:8080", default=8080, type=int
     )
+    parser.add_argument("--debug", action="store_true", help="debug")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = get_option()
-    if not args.no_web:
-        URL: Final[str] = "kuretan-lab.com"
-        try:
-            browser = webbrowser.get(
-                '"C:\Program Files\Google\Chrome\Application\chrome.exe" %s '
-            )
-            browser.open_new(URL)
-        except:
-            logger.warning("Fail to run Chrome.")
-            webbrowser.open(URL)
-    logger.info("Start FAST_api")
     CONFIGFILES: Final[list] = glob.glob(
         os.path.expanduser("~")
         + "\\AppData\\LocalLow\\VRChat\\VRChat\\OSC\\\**\\*.json",
         recursive=True,
     )
-    CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION, args.no_select)
-    Lib_config = lib.KatOscConfig(file=CONVERT_FILE, logger_object=logger)
+    if args.debug:
+        logger.info("Start Debugmode")
+        CONVERT_FILE = get_conver_file(PRESENT_LOCATION, False)
+        Lib_config = lib.KatOscConfig(
+            file=CONVERT_FILE, logger_object=logger, osc_port=9002, osc_server_port=9003
+        )
+    else:
+        logger.info("Start FAST_api")
+        if not args.no_web:
+            URL: Final[str] = "kuretan-lab.com"
+            try:
+                browser = webbrowser.get(
+                    '"C:\Program Files\Google\Chrome\Application\chrome.exe" %s '
+                )
+                browser.open_new(URL)
+            except:
+                logger.warning("Fail to run Chrome.")
+                webbrowser.open(URL)
+        CONVERT_FILE = get_conver_file(PRESENT_LOCATION, args.no_select)
+        # CONVERT_FILE = get_conver_file(PRESENT_LOCATION, False)
+        Lib_config = lib.KatOscConfig(file=CONVERT_FILE, logger_object=logger)
+
     Lib = lib.KatOsc(config=Lib_config)
     edit_database = edit_database.Edit_database(logger_object=logger)
     start_fastapi(host=args.host_ip, port=args.port)

@@ -42,11 +42,11 @@ class KatOscConfig:
     osc_server_ip: str = "127.0.0.1"  # OSC server IP to listen too
     osc_server_port: str = 9001  # OSC network port for recieving messages
 
-    osc_delay: float = 0.25  # Delay between network updates in seconds. Setting this too low will cause issues.
+    osc_delay: float = 0.60  # Delay between network updates in seconds. Setting this too low will cause issues.
     sync_params: int = 4  # Default sync parameters. This is automatically updated if the OSC server is enabled.
     line_length: int = 32  # Characters per line of text
-    line_count: int = 8  # Maximum lines of text
     text_length: int = 256  # Maximum length of text
+    sync_wait: float = 0.10  # Waitting time between sendings. longer, less sync bug ?
     file: str = None
     loop: Any = None
     logger_object: Any = None
@@ -59,7 +59,6 @@ class KatOscConfig:
             self.osc_delay,
             self.sync_params,
             self.line_length,
-            self.line_count,
             self.text_length,
         ]
         for value in variables:
@@ -86,13 +85,13 @@ class KatOsc:
         self.osc_server_port = config.osc_server_port
 
         self.osc_delay = config.osc_delay
+        self.sync_wait = config.sync_wait
         self.sync_params = config.sync_params
 
         self.line_length = config.line_length  # Characters per line of text
-        self.line_count = config.line_count  # Maximum lines of text
         self.text_length = config.text_length  # Maximum length of text
 
-        self.sync_params_max = 35  # Maximum sync parameters
+        self.sync_params_max = 25  # Maximum sync parameters
         self.old_sentence = ""
 
         self.pointer_count = int(self.text_length / self.sync_params)
@@ -105,10 +104,10 @@ class KatOsc:
         self.param_visible = "KAT_Visible"
         self.param_pointer = "KAT_Pointer"
         self.param_sync = "KAT_CharSync"
+        self.param_loading = "KAT_Loading"
 
         self.osc_parameter_prefix = "/avatar/parameters/"
         self.osc_avatar_change_path = "/avatar/change"
-        self.osc_loading_path = "/avatar/parameters/is_loading"
         self.osc_text = ""
         self.target_text = ""
 
@@ -194,13 +193,16 @@ class KatOsc:
 
     def change_convertlist(self, file):
         """
-        Change setting over using KAT
+        Change convertlist over using KAT
         """
         self.file = file
         self.read_convertlist()
-        self.logger.info("Config changed")
+        self.logger.info("Change convertlist ")
 
     def change_text_length(self, text_length):
+        """
+        change_text_length
+        """
         self.text_length = text_length  # Maximum length of text
         self.pointer_count = int(self.text_length / self.sync_params)
         self.logger.info("Config changed")
@@ -252,7 +254,10 @@ class KatOsc:
                     word = word.replace(ng, ng[0] + "x" * (len(ng) - 1))
                 if word.replace("/n", "") == ng_title:
                     word = word.replace(ng_title, ng_title[0] + "x" * (len(ng) - 1))
-            temp_text = temp_text + " " + "".join(word)
+            if temp_text != "":
+                temp_text = temp_text + " " + "".join(word)
+            else:
+                temp_text = "".join(word)
         return temp_text
 
     def remove_from_list_jp(self, row: list[str], text: str) -> str:
@@ -266,6 +271,8 @@ class KatOsc:
     def osc_timer_loop(self) -> None:
         """
         Syncronisation loop
+        This loop transmit texts to VRChat.
+
         """
         gui_text = self.target_text
 
@@ -328,27 +335,32 @@ class KatOsc:
 
         # Pad text with spaces up to the text limit
         gui_text = gui_text.ljust(int(self.text_length))
-        gui_text = gui_text[
-            0 : int(self.text_length / 2)
-        ]  # cut sentence longer than 64
+        gui_text = gui_text[0 : int(self.text_length / 2)]
         gui_text += gui_text
         osc_text = self.osc_text.ljust(self.text_length)
 
         # Text syncing
+        # If you send texts too quickly, it gets garbled
+        # You need wait during OSC sendings
+        # Waitting time depends on situations.
+
         if gui_text != self.osc_text:  # GUI text is different, needs sync
-            # Keep text clear to avoid text garbling
+            self.stop_timer()
+            # Keep text clear to avoid a text garbling
             self._clear_text()
+            sleep(0.2)  # You need wait till the text get cleared
             self.load_start()
             self.hide()
+            osc_text = "".ljust(self.text_length)
             osc_chars = list(osc_text)
 
             for pointer_index in range(self.pointer_count):
-                # Check if characters within this pointer are different
+                # Check if characters is space
                 equal = True
                 for char_index in range(self.sync_params):
                     index = (pointer_index * self.sync_params) + char_index
 
-                    if gui_text[index] != osc_text[index]:
+                    if gui_text[index] != " ":
                         equal = False
                         break
 
@@ -391,19 +403,16 @@ class KatOsc:
                         osc_chars[
                             index
                         ] = gui_char  # Apply changes to the networked value
+                    sleep(self.sync_wait)
 
                     self.osc_text = self._list_to_string(osc_chars)
                     if self.old_sentence != gui_text:
                         self.old_sentence = gui_text
-                    sleep(0.5)  #
+            self.osc_text = gui_text
             self.load_end()
-            sleep(0.1)
             self.show()
+            self.start_timer()
         return
-
-    def resend_text(self) -> None:
-        self.set_text(self.old_sentence)
-        print("resemt")
 
     def osc_server_start(self) -> None:
         """
@@ -418,6 +427,7 @@ class KatOsc:
         if self.osc_server_test_step > 0:
             length = len(self.osc_parameter_prefix + self.param_sync)
             self.sync_params = max(self.sync_params, int(address[length:]) + 1)
+            logger.info(f"sync params ={self.sync_params}")
 
     def osc_server_handler_avatar(self, address, value, *args) -> None:
         """
@@ -438,18 +448,19 @@ class KatOsc:
         lines = max(math.ceil(len(text) / self.line_length), 1)
         return self.line_length * lines
 
-    def _clear_text(self) ->None:
+    def _clear_text(self) -> None:
+        self.osc_text = " ".ljust(self.text_length)
         self.osc_client.send_message(
-                self.osc_parameter_prefix + self.param_pointer, self.pointer_clear
+            self.osc_parameter_prefix + self.param_pointer, self.pointer_clear
         )
 
     # Stop the timer and hide the text overlay
-    def stop(self):
+    def stop_timer(self):
         self.osc_timer.stop()
         self.hide()
 
     # Restart the timer for syncing texts and show the overlay
-    def start(self):
+    def start_timer(self):
         self.osc_timer.start()
         self.show()
 
@@ -466,14 +477,17 @@ class KatOsc:
         )
 
     def load_start(self):
-        self.osc_client.send_message(self.osc_loading_path, True)
-        pass
+        self.osc_client.send_message(
+            self.osc_parameter_prefix + self.param_loading, True
+        )
 
     def load_end(self):
-        self.osc_client.send_message(self.osc_loading_path, False)
-        pass
+        self.osc_client.send_message(
+            self.osc_parameter_prefix + self.param_loading, False
+        )
 
 
+# 同時に動いてします
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
         self._timer = None
