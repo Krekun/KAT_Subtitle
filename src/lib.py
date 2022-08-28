@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from logging import raiseExceptions
 from threading import Timer
 from time import sleep
 import math
@@ -42,11 +43,12 @@ class KatOscConfig:
     osc_server_ip: str = "127.0.0.1"  # OSC server IP to listen too
     osc_server_port: str = 9001  # OSC network port for recieving messages
 
-    osc_delay: float = 0.60  # Delay between network updates in seconds. Setting this too low will cause issues.
+    osc_delay: float = 0.20  # Delay between network updates in seconds. Setting this too low will cause issues.
     sync_params: int = 4  # Default sync parameters. This is automatically updated if the OSC server is enabled.
     line_length: int = 32  # Characters per line of text
     text_length: int = 256  # Maximum length of text
     sync_wait: float = 0.10  # Waitting time between sendings. longer, less sync bug ?
+    # pointer_count: int = int(text_length / sync_params)
     file: str = None
     loop: Any = None
     logger_object: Any = None
@@ -203,9 +205,23 @@ class KatOsc:
         """
         change_text_length
         """
+        if text_length <= 0:
+            raise ValueError(f"text_length {text_length} should be valid number")
         self.text_length = text_length  # Maximum length of text
         self.pointer_count = int(self.text_length / self.sync_params)
-        self.logger.info("Config changed")
+        self.logger.info("text_length changed")
+
+    def change_sync_wait(self, sync_wait):
+        if sync_wait <= 0:
+            raise ValueError(f"sync_wait {sync_wait} should be valid number")
+        self.sync_wait = sync_wait
+        self.logger.info("sync_wait changed")
+
+    def change_line_length(self, line_length):
+        if line_length <= 0:
+            raise ValueError(f"line_length {line_length} should be valid number")
+        self.line_length = line_length
+        self.logger.info("line_length changed")
 
     def toggle_mic(self, _: str, muteself: bool) -> None:
         """
@@ -403,7 +419,7 @@ class KatOsc:
                         osc_chars[
                             index
                         ] = gui_char  # Apply changes to the networked value
-                    sleep(self.sync_wait)
+                        sleep(self.sync_wait)
 
                     self.osc_text = self._list_to_string(osc_chars)
                     if self.old_sentence != gui_text:
@@ -427,7 +443,7 @@ class KatOsc:
         if self.osc_server_test_step > 0:
             length = len(self.osc_parameter_prefix + self.param_sync)
             self.sync_params = max(self.sync_params, int(address[length:]) + 1)
-            logger.info(f"sync params ={self.sync_params}")
+            # self.logger.info(f"sync params ={self.sync_params}")
 
     def osc_server_handler_avatar(self, address, value, *args) -> None:
         """

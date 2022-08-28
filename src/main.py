@@ -84,8 +84,10 @@ class ConfigSetting(BaseModel):
     `ConfigSetting` is a class that has four attributes: `text_length`.
     """
 
-    new_convert_file: bool
+    new_convert_file: Union[bool, None]
     text_length: Union[int, None]
+    sync_wait: Union[float, None]
+    line_length: Union[int, None]
 
 
 @app.get("/api_key/")
@@ -105,6 +107,50 @@ def get_api_key() -> dict[str, str]:
 @app.put("/api_key/")
 def update_api_key(item: Item) -> None:
     edit_database.update_api_table(item.api_name, item.url)
+
+
+@app.get("/kat_config")
+def get_kat_config() -> dict[str, str]:
+    """
+    Trying to get the text length, line length, and sync wait from the database.
+  
+    """
+    try:
+        text_length, line_length, sync_wait = edit_database.get_kat_config()
+        return {
+            "text_length": text_length,
+            "line_length": line_length,
+            "sync_wait": sync_wait,
+        }
+    except TypeError:
+        pass
+
+
+@app.post("/kat_config")
+def post_kat_config(config_value: ConfigSetting) -> None:
+    """
+    Updating the database with the new values.
+    """
+    text_length, line_length, sync_wait = edit_database.get_kat_config()
+    if config_value.new_convert_file:
+        NEW_CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION, True)
+        if NEW_CONVERT_FILE == "":
+            raise HTTPException(status_code=500, detail="Select a file")
+        else:
+            Lib.change_convertlist(NEW_CONVERT_FILE)
+            # Lib.resend_text()
+    if config_value.text_length:
+        text_length = config_value.text_length
+
+        Lib.change_text_length(config_value.text_length)
+    if config_value.sync_wait:
+        sync_wait = config_value.sync_wait
+        Lib.change_sync_wait(config_value.sync_wait)
+    if config_value.line_length:
+        line_length = config_value.line_length
+        Lib.change_line_length(config_value.line_length)
+
+    edit_database.update_kat_config(text_length, line_length, sync_wait)
 
 
 @app.post("/text-message/")
@@ -130,7 +176,7 @@ def post_text_message(textmessage: TextMessage) -> None:
             value = True
         else:
             value = float(value)
-        print(address, value)
+        # print(address, value)
         Lib.osc_client.send_message(address, value)
     elif textmessage.text_type == "offical-text-chat":
         Lib.osc_client.send_message("/chatbox/input", (textmessage.text_message, True))
@@ -196,7 +242,7 @@ def fetch_kat_version():
     :return: The version of the KAT software.
     """
     logger.info("Connected to Web server")
-    return float(0.32)
+    return float(0.4)
 
 
 @app.get("/toggle-mic/")
@@ -233,8 +279,7 @@ def update_spoken_sentences(spoken_sentece: SpokenSentence):
     """
     Update the spoken sentences in the database
     """
-    if spoken_sentece.spoken_sentece != "":
-        edit_database.update_spoken_sentences(spoken_sentece.SpokenSentence)
+    edit_database.update_spoken_sentences(spoken_sentece.SpokenSentence)
 
 
 @app.get("/")
@@ -243,23 +288,6 @@ def index() -> None:
     Redirect to documents
     """
     return RedirectResponse(url="/docs/")
-
-
-@app.put("/config")
-def change_config(config_value: ConfigSetting) -> None:
-    """
-    Upadate config setting
-    """
-    # print(config_value.text_length)
-    if config_value.new_convert_file:
-        NEW_CONVERT_FILE: Final[str] = get_conver_file(PRESENT_LOCATION, True)
-        if NEW_CONVERT_FILE == "":
-            raise HTTPException(status_code=500, detail="Select a file")
-        else:
-            Lib.change_convertlist(NEW_CONVERT_FILE)
-            Lib.resend_text()
-    if config_value.text_length:
-        Lib.change_text_length(config_value.text_length)
 
 
 def start_fastapi(host: str = "127.0.0.1", port: int = 8080):
@@ -298,12 +326,30 @@ if __name__ == "__main__":
         + "\\AppData\\LocalLow\\VRChat\\VRChat\\OSC\\\**\\*.json",
         recursive=True,
     )
+    edit_database = edit_database.Edit_database(logger_object=logger)
+    dic = get_kat_config()
+    if not dic:
+        # default value
+        default_text_length = 128
+        default_line_length = 16
+        default_sync_wait = 0.1
+        edit_database.update_kat_config(
+            default_text_length, default_line_length, default_sync_wait
+        )
+
     if args.debug:
         logger.info("Start Debugmode")
         CONVERT_FILE = get_conver_file(PRESENT_LOCATION, False)
         Lib_config = lib.KatOscConfig(
-            file=CONVERT_FILE, logger_object=logger, osc_port=9002, osc_server_port=9003
+            file=CONVERT_FILE,
+            logger_object=logger,
+            osc_port=9002,
+            osc_server_port=9003,
+            text_length=dic["text_length"] if dic else default_text_length,
+            line_length=dic["line_length"] if dic else default_line_length,
+            sync_wait=dic["sync_wait"] if dic else default_sync_wait,
         )
+
     else:
         logger.info("Start FAST_api")
         if not args.no_web:
@@ -318,8 +364,12 @@ if __name__ == "__main__":
                 webbrowser.open(URL)
         CONVERT_FILE = get_conver_file(PRESENT_LOCATION, args.no_select)
         # CONVERT_FILE = get_conver_file(PRESENT_LOCATION, False)
-        Lib_config = lib.KatOscConfig(file=CONVERT_FILE, logger_object=logger)
-
+        Lib_config = lib.KatOscConfig(
+            file=CONVERT_FILE,
+            logger_object=logger,
+            text_length=dic["text_length"] if dic else default_text_length,
+            line_length=dic["line_length"] if dic else default_line_length,
+            sync_wait=dic["sync_wait"] if dic else default_sync_wait,
+        )
     Lib = lib.KatOsc(config=Lib_config)
-    edit_database = edit_database.Edit_database(logger_object=logger)
     start_fastapi(host=args.host_ip, port=args.port)
