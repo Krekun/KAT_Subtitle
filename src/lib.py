@@ -364,9 +364,8 @@ class KatOsc:
             self.stop_timer()
             # Keep text clear to avoid a text garbling
             self._clear_text()
-            sleep(0.2)  # You need wait till the text get cleared
+            sleep(0.1)  # You need wait till the text get cleared.
             self.load_start()
-            self.hide()
             osc_text = "".ljust(self.text_length)
             osc_chars = list(osc_text)
 
@@ -383,11 +382,11 @@ class KatOsc:
                 if (
                     not equal
                 ):  # Characters not equal, need to sync this pointer position
+
                     self.osc_client.send_message(
                         self.osc_parameter_prefix + self.param_pointer,
                         pointer_index + 1,
                     )  # Set pointer position
-
                     # Loop through characters within this pointer and set them
                     for char_index in range(self.sync_params):
                         index = (pointer_index * self.sync_params) + char_index
@@ -419,8 +418,10 @@ class KatOsc:
                         osc_chars[
                             index
                         ] = gui_char  # Apply changes to the networked value
-                        sleep(self.sync_wait)
-
+                        sleep(
+                            0.001
+                        )  # Don't send OSC at the same time. Just wait 0.001 sec
+                    sleep(self.sync_wait)  # wait till the job done
                     self.osc_text = self._list_to_string(osc_chars)
                     if self.old_sentence != gui_text:
                         self.old_sentence = gui_text
@@ -469,6 +470,7 @@ class KatOsc:
         self.osc_client.send_message(
             self.osc_parameter_prefix + self.param_pointer, self.pointer_clear
         )
+        self.hide()
 
     # Stop the timer and hide the text overlay
     def stop_timer(self):
@@ -503,7 +505,6 @@ class KatOsc:
         )
 
 
-# 同時に動いてします
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
         self._timer = None
